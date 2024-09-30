@@ -1,3 +1,13 @@
+import os
+import django
+from datetime import date
+
+# Setup Django environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'job_scraper.settings')  # Replace with your project's settings module
+django.setup()
+
+from scrape_jobs.models import JobListing  # Import your JobListing model
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -49,6 +59,15 @@ def extract_job_listings():
             except:
                 job_salary = "Not listed"
             
+            # Save job details to the database
+            JobListing.objects.create(
+                title=job_title,
+                company="N/A",  # If you want to extract the company name, you need to do so
+                location=job_location,
+                description="N/A",  # You may extract a description if available
+                date_posted=date.today()  # Adjust as necessary
+            )
+            
             # Print the job details
             print(f"Job Title: {job_title}")
             print(f"Location: {job_location}")
@@ -67,8 +86,6 @@ def go_to_next_page():
     except Exception as e:
         print(f"No more pages or error clicking Next: {e}")
         return False
-
-
 
 # Initialize the page counter
 page_counter = 0
