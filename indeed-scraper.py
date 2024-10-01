@@ -1,6 +1,7 @@
 import os
 import django
 from datetime import date
+import time
 
 # Setup Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'job_scraper.settings')  # Replace with your project's settings module
@@ -14,7 +15,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-import time
 
 # Function to generate Indeed URL based on user input
 def generate_indeed_url(job_title, location):
@@ -40,36 +40,46 @@ driver.get(url)
 # Wait for the page to load
 wait = WebDriverWait(driver, 10)
 
-# Function to extract job listings from the current page
 def extract_job_listings():
     job_listings = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'job_seen_beacon')))
     
-    # Loop through job listings and extract job title, location, and salary (if available)
     for job in job_listings:
         try:
-            # Extract job title using span with an id that starts with 'jobTitle'
+            # Extract job title
             job_title = job.find_element(By.CSS_SELECTOR, 'span[id^="jobTitle"]').text
-            
-            # Extract location using 'data-testid="text-location"' attribute
-            job_location = job.find_element(By.CSS_SELECTOR, 'div[data-testid="text-location"]').text
-            
-            # Extract salary using 'data-testid="attribute_snippet_testid"' (if available)
+
+            # Extract location 
+            try:
+                job_location = job.find_element(By.CSS_SELECTOR, 'div[data-testid="text-location"]').text
+            except:
+                job_location = "Location not listed"
+
+            # Extract company name
+            try:
+                company_span = job.find_element(By.CSS_SELECTOR, 'span[data-testid="company-name"]')
+                job_company = company_span.text  # Extract the company name
+            except:
+                job_company = "Company not listed"
+
+            # Extract salary (if available)
             try:
                 job_salary = job.find_element(By.CSS_SELECTOR, 'div[data-testid="attribute_snippet_testid"]').text
             except:
                 job_salary = "Not listed"
-            
+
             # Save job details to the database
             JobListing.objects.create(
                 title=job_title,
-                company="N/A",  # If you want to extract the company name, you need to do so
                 location=job_location,
-                description="N/A",  # You may extract a description if available
-                date_posted=date.today()  # Adjust as necessary
+                company=job_company,
+                description="N/A",  # Adjust as necessary
+                date_posted=date.today(),
+                salary=job_salary
             )
             
             # Print the job details
             print(f"Job Title: {job_title}")
+            print(f"Company: {job_company}")
             print(f"Location: {job_location}")
             print(f"Salary: {job_salary}")
             print('-' * 40)
@@ -95,7 +105,7 @@ while page_counter < max_pages:
     extract_job_listings()  # Extract job listings from the current page
     
     # Wait for a few seconds to ensure the next page loads fully
-    time.sleep(3)
+    time.sleep(10)  # You can adjust this timing if needed
     
     # Try to go to the next page
     if not go_to_next_page():
