@@ -54,34 +54,35 @@ def extract_job_listings():
             except:
                 job_location = "Location not listed"
 
-            # Extract company name
+            # Extract company name 
             try:
                 company_span = job.find_element(By.CSS_SELECTOR, 'span[data-testid="company-name"]')
                 job_company = company_span.text  # Extract the company name
             except:
                 job_company = "Company not listed"
 
-            # Extract salary (if available)
+            # Extract all attributes (e.g. salary/full time)
             try:
-                job_salary = job.find_element(By.CSS_SELECTOR, 'div[data-testid="attribute_snippet_testid"]').text
+                attributes_elements = job.find_elements(By.CSS_SELECTOR, 'div[data-testid="attribute_snippet_testid"]')
+                attribute_texts = [attribute.text for attribute in attributes_elements]  # Gets text for each element
+                all_attributes = " | ".join(attribute_texts)  # Joins them into a single string
             except:
-                job_salary = "Not listed"
+                all_attributes = "Not listed"  # Default value if extraction fails
 
             # Save job details to the database
             JobListing.objects.create(
                 title=job_title,
                 location=job_location,
                 company=job_company,
-                description="N/A",  # Adjust as necessary
                 date_posted=date.today(),
-                salary=job_salary
+                attributes=all_attributes  # Make sure this matches your model's field
             )
             
             # Print the job details
             print(f"Job Title: {job_title}")
             print(f"Company: {job_company}")
             print(f"Location: {job_location}")
-            print(f"Salary: {job_salary}")
+            print(f"Attributes: {all_attributes}")
             print('-' * 40)
             
         except Exception as e:
