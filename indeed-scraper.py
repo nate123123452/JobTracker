@@ -14,7 +14,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException, TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Function to generate Indeed URL based on user input
@@ -31,10 +31,8 @@ def extract_job_listings(driver, wait):
 
     for job in job_listings:
         try:
-            # Extract job title
+            # Extract job title, location, and company
             job_title = job.find_element(By.CSS_SELECTOR, 'span[id^="jobTitle"]').text
-
-            # Extract location 
             job_location = job.find_element(By.CSS_SELECTOR, 'div[data-testid="text-location"]').text
             job_company = job.find_element(By.CSS_SELECTOR, 'span[data-testid="company-name"]').text
 
@@ -44,28 +42,42 @@ def extract_job_listings(driver, wait):
                 location=job_location,
                 company=job_company,
                 date_posted=date.today(),
-                attributes="Not listed"  # Placeholder, will update after extracting skills
+                attributes="Not listed",  # Placeholder, will update after extracting skills
+                job_description="Not available"  # Placeholder for job description
             )
             job_listing_instance.save()
+
+            # Print the basic job details
+            print(f"Saved job listing: {job_title} at {job_company} in {job_location}")
 
             # Click on the job to view more details
             job.click()
 
             # Wait for the details to load
-            time.sleep(4)  # Adjust if needed
+            wait.until(EC.presence_of_element_located((By.ID, 'jobDescriptionText')))  # Wait for the job description to load
 
             # Extract skills from the job detail page
             attributes = extract_attributes(driver, wait)
 
-            # Update job instance with skills
+            # Extract benefits from the job detail page
+            benefits = extract_benefits(driver, wait)
+
+            # Extract job description from the job detail page
+            job_description = extract_job_description(driver, wait)
+
+            # Update job instance with skills, benefits, and job description
             job_listing_instance.attributes = " | ".join(attributes) if attributes else "No attribute listed"
-            job_listing_instance.save()  # Save updated attributes
+            job_listing_instance.benefits = " | ".join(benefits) if benefits else "No benefits listed"
+            job_listing_instance.job_description = "\n".join(job_description)  # Join job description into a single string
+            job_listing_instance.save()  # Save updated attributes, benefits, and job description
 
             # Print the job details
             print(f"Job Title: {job_title}")
             print(f"Company: {job_company}")
             print(f"Location: {job_location}")
             print(f"Attributes: {', '.join(attributes) if attributes else 'No attributes listed'}")
+            print(f"Benefits: {', '.join(benefits) if benefits else 'No benefits listed'}")
+            print(f"Job Description: {job_description}")
             print('-' * 40)
             
             # Go back to the job listings
@@ -79,26 +91,87 @@ def extract_job_listings(driver, wait):
             time.sleep(2)
             driver.back()
         except Exception as e:
-            print(f"Error extracting job details: {e}")
+            print(f"Error Extracting!!!")
+
 
 def extract_attributes(driver, wait):
     attributes = []
     try:
-        # Wait until the page loads and the specific div elements are present
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')))
-
-        # Find all skill-related div elements by class name
+        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')))
         attributes_divs = driver.find_elements(By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')
 
+        if not attributes_divs:
+            print("No attributes found.")
+            return attributes
+
         for div in attributes_divs:
-            attribute_name = div.text.strip()  # Get the text content and strip unnecessary whitespace
-            if attribute_name:  # Ensure it's not an empty string
+            attribute_name = div.text.strip()
+            if attribute_name:
                 attributes.append(attribute_name)
 
+        if not attributes:
+            print("Attributes were found, but they are empty.")
+        
     except Exception as e:
-        print(f"Error extracting skills: {e}")
-    
+        print(f"No attributes!!!")
+
     return attributes
+
+
+
+def extract_benefits(driver, wait):
+    benefits = []
+    try:
+        # Wait for the benefits section to be present
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div#benefits[data-testid="benefits-test"]')))
+        
+        # Find the benefits list element
+        benefits_list = driver.find_element(By.CSS_SELECTOR, 'div#benefits[data-testid="benefits-test"] ul')
+
+        # Check if the benefits list is found
+        if not benefits_list:
+            print("No benefits section found.")
+            return benefits  # Return an empty list
+
+        # Extract all benefits listed in <li> elements
+        benefits_items = benefits_list.find_elements(By.TAG_NAME, 'li')
+        if not benefits_items:  # Check if no benefits found
+            print("No benefits found.")
+            return benefits  # Return an empty list
+
+        for item in benefits_items:
+            benefits.append(item.text.strip())  # Get the text and strip whitespace
+
+    except Exception as e:
+        print(f"No benefits!!!")
+    
+    return benefits
+
+
+
+def extract_job_description(driver, wait):
+    job_description = []
+    try:
+        # Wait for the job description section to be present
+        wait.until(EC.presence_of_element_located((By.ID, 'jobDescriptionText')))
+        
+        # Find the job description element
+        job_description_div = driver.find_element(By.ID, 'jobDescriptionText')
+
+        # Extract all paragraphs (<p>) in the job description
+        paragraphs = job_description_div.find_elements(By.TAG_NAME, 'p')
+        for paragraph in paragraphs:
+            job_description.append(paragraph.text.strip())  # Get the text and strip whitespace
+        
+        # Extract all list items (<li>) in the job description (if any)
+        list_items = job_description_div.find_elements(By.TAG_NAME, 'li')
+        for item in list_items:
+            job_description.append(item.text.strip())  # Get the text and strip whitespace
+            
+    except Exception as e:
+        print(f"No description!!!")
+    
+    return job_description
 
 
 # Function to check if the "Next" button exists and click it
@@ -106,9 +179,10 @@ def go_to_next_page(driver):
     try:
         next_button = driver.find_element(By.CSS_SELECTOR, 'a[data-testid="pagination-page-next"]')
         next_button.click()  # Click the "Next" button to load the next page
+        print("Clicked next page.")
         return True
     except NoSuchElementException:
-        print(f"No more pages available.")
+        print("No more pages available.")
         return False
     except Exception as e:
         print(f"Error clicking Next: {e}")
@@ -120,6 +194,7 @@ def scrape_job_listings(driver, wait, max_pages):
     
     # Loop through pages and extract job listings until no more pages are found or the page limit is reached
     while page_counter < max_pages:
+        print(f"Scraping page {page_counter + 1}...")
         extract_job_listings(driver, wait)  # Extract job listings from the current page
         
         # Wait for a few seconds to ensure the next page loads fully
@@ -146,17 +221,21 @@ def main():
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
 
-    # Open the initial Indeed job listings page
-    driver.get(url)
+    try:
+        # Open the initial Indeed job listings page
+        driver.get(url)
 
-    # Wait for the page to load
-    wait = WebDriverWait(driver, 10)
+        # Wait for the page to load completely
+        wait = WebDriverWait(driver, 10)  # Adjust timeout if necessary
 
-    # Call the function to start scraping
-    scrape_job_listings(driver, wait, max_pages)
+        # Start scraping job listings
+        scrape_job_listings(driver, wait, max_pages)
 
-    # Close the WebDriver
-    driver.quit()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        driver.quit()  # Close the WebDriver
 
 if __name__ == "__main__":
     main()
