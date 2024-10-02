@@ -91,15 +91,15 @@ def extract_job_listings(driver, wait):
             time.sleep(2)
             driver.back()
         except Exception as e:
-            print(f"Error Extracting!!!")
+         print(f"Error Extracting!!!: {e}")
 
 
 def extract_attributes(driver, wait):
     attributes = []
     try:
-        wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')))
-        attributes_divs = driver.find_elements(By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')
-
+        # Shorter timeout to avoid delays if attributes don't exist
+        attributes_divs = WebDriverWait(driver, 3).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div.js-match-insights-provider-tvvxwd')))
+        
         if not attributes_divs:
             print("No attributes found.")
             return attributes
@@ -109,70 +109,54 @@ def extract_attributes(driver, wait):
             if attribute_name:
                 attributes.append(attribute_name)
 
-        if not attributes:
-            print("Attributes were found, but they are empty.")
-        
+    except TimeoutException:
+        print("No attributes found in the time limit.")
     except Exception as e:
-        print(f"No attributes!!!")
+        print(f"Error extracting attributes: {e}")
 
     return attributes
-
-
 
 def extract_benefits(driver, wait):
     benefits = []
     try:
-        # Wait for the benefits section to be present
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div#benefits[data-testid="benefits-test"]')))
-        
+        # Shorter timeout to avoid delays if benefits don't exist
+        benefits_section = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div#benefits[data-testid="benefits-test"]')))
+
         # Find the benefits list element
-        benefits_list = driver.find_element(By.CSS_SELECTOR, 'div#benefits[data-testid="benefits-test"] ul')
+        benefits_list = benefits_section.find_element(By.TAG_NAME, 'ul')
+        if benefits_list:
+            benefits_items = benefits_list.find_elements(By.TAG_NAME, 'li')
+            for item in benefits_items:
+                benefits.append(item.text.strip())  # Get the text and strip whitespace
 
-        # Check if the benefits list is found
-        if not benefits_list:
-            print("No benefits section found.")
-            return benefits  # Return an empty list
-
-        # Extract all benefits listed in <li> elements
-        benefits_items = benefits_list.find_elements(By.TAG_NAME, 'li')
-        if not benefits_items:  # Check if no benefits found
-            print("No benefits found.")
-            return benefits  # Return an empty list
-
-        for item in benefits_items:
-            benefits.append(item.text.strip())  # Get the text and strip whitespace
-
+    except TimeoutException:
+        print("No benefits found in the time limit.")
     except Exception as e:
-        print(f"No benefits!!!")
-    
+        print(f"Error extracting benefits: {e}")
+
     return benefits
-
-
 
 def extract_job_description(driver, wait):
     job_description = []
     try:
-        # Wait for the job description section to be present
-        wait.until(EC.presence_of_element_located((By.ID, 'jobDescriptionText')))
-        
-        # Find the job description element
-        job_description_div = driver.find_element(By.ID, 'jobDescriptionText')
+        # Short timeout for job description extraction
+        job_description_div = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, 'jobDescriptionText')))
 
-        # Extract all paragraphs (<p>) in the job description
+        # Extract all paragraphs (<p>) and list items (<li>) in the job description
         paragraphs = job_description_div.find_elements(By.TAG_NAME, 'p')
-        for paragraph in paragraphs:
-            job_description.append(paragraph.text.strip())  # Get the text and strip whitespace
-        
-        # Extract all list items (<li>) in the job description (if any)
         list_items = job_description_div.find_elements(By.TAG_NAME, 'li')
-        for item in list_items:
-            job_description.append(item.text.strip())  # Get the text and strip whitespace
-            
-    except Exception as e:
-        print(f"No description!!!")
-    
-    return job_description
 
+        for paragraph in paragraphs:
+            job_description.append(paragraph.text.strip())
+        for item in list_items:
+            job_description.append(item.text.strip())
+
+    except TimeoutException:
+        print("No description found in the time limit.")
+    except Exception as e:
+        print(f"Error extracting description: {e}")
+
+    return job_description
 
 # Function to check if the "Next" button exists and click it
 def go_to_next_page(driver):
@@ -188,10 +172,10 @@ def go_to_next_page(driver):
         print(f"Error clicking Next: {e}")
         return False
 
-# New function to handle pagination and extraction
+# Function to handle pagination and extraction
 def scrape_job_listings(driver, wait, max_pages):
     page_counter = 0
-    
+
     # Loop through pages and extract job listings until no more pages are found or the page limit is reached
     while page_counter < max_pages:
         print(f"Scraping page {page_counter + 1}...")
