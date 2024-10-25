@@ -24,6 +24,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 def generate_indeed_url(job_title, location):
     base_url = "https://www.indeed.com/jobs"
     return f"{base_url}?q={job_title}&l={location}"
+
 def extract_job_listings(driver, wait):
     try:
         job_listings = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'job_seen_beacon')))
