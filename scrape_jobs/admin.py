@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import JobListing, ResumeListing, Keyword
+from .models import JobListing, ResumeListing
 
 # JobListing Admin
 class JobListingAdmin(admin.ModelAdmin):
@@ -13,13 +13,6 @@ class ResumeListingAdmin(admin.ModelAdmin):
     search_fields = ('text',)  # Allow searching by text
     list_filter = ('keywords',)  # Allow filtering by keywords
 
-# Keyword Admin
-class KeywordAdmin(admin.ModelAdmin):
-    list_display = ('words',)  # Display the keyword words
-    search_fields = ('words',)  # Allow searching by words
-    list_filter = ('words',)  # Filter by keywords
-
 # Register the models with the admin site
 admin.site.register(JobListing, JobListingAdmin)
 admin.site.register(ResumeListing, ResumeListingAdmin)
-admin.site.register(Keyword, KeywordAdmin)
