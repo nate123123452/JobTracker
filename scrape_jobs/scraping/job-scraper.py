@@ -26,37 +26,26 @@ def get_user_input():
     
     return company_name, website_url, job_description
 
-
 def save_job_listing(company_name, website_url, job_description):
     """Save the job listing to the database."""
     # Clean the job description
     cleaned_description = clean_extracted_text(job_description)
     
     # Extract keywords from the cleaned description
-    keywords = extract_all_keywords(cleaned_description)
+    extracted_keywords = extract_all_keywords(cleaned_description)
+
+    # Join keywords into a single string (comma-separated) for storage
+    keyword_string = ', '.join(extracted_keywords)
 
     # Save the job listing to the database
     job_listing = JobListing(
         job_name=company_name,
         website=website_url,
-        text=cleaned_description  # Save the cleaned description
+        text=cleaned_description,  # Save the cleaned description
+        keywords=keyword_string  # Save keywords as a string
     )
     job_listing.save()  # Save the job listing to the database
     print("Job listing saved successfully.")
-
-    # Save keywords to the database
-    # save_keywords_to_model(keywords)
-
-# def save_keywords_to_model(keywords):
-#     """Save the extracted keywords to the Keyword model."""
-#     for keyword in keywords:
-#         # Check if the keyword already exists to avoid duplicates
-#         if not Keyword.objects.filter(words=keyword).exists():
-#             # Create and save a new keyword in the model
-#             Keyword.objects.create(words=keyword)
-#             print(f"Saved keyword: {keyword}")
-#         else:
-#             print(f"Keyword already exists: {keyword}")
 
 def main():
     """Main function to run the job scraper."""
