@@ -34,8 +34,8 @@ def extract_all_keywords(text):
     ]
     
     def is_valid_keyword(keyword):
-        """Check if the keyword matches any exclusion pattern."""
-        return not any(re.search(pattern, keyword) for pattern in patterns_to_exclude)
+        """Check if the keyword matches any exclusion pattern and has more than one character."""
+        return len(keyword) > 1 and not any(re.search(pattern, keyword) for pattern in patterns_to_exclude)
     
     # Extract individual tokens (lemma form, lowercased) with specified POS
     for token in doc:
@@ -48,17 +48,20 @@ def extract_all_keywords(text):
         ):
             keywords.add(keyword)
     
-    # Extract noun phrases (filtering based on length or specific keywords if needed)
+    # Split multi-word noun phrases into individual words
     for chunk in doc.noun_chunks:
-        phrase = chunk.text.lower()
-        if len(phrase.split()) <= 3 and is_valid_keyword(phrase):  # Ignore overly long phrases
-            keywords.add(phrase)
+        words = chunk.text.lower().split()
+        for word in words:
+            if is_valid_keyword(word):
+                keywords.add(word)
     
-    # Extract named entities, focusing on specific entity types if necessary
+    # Split multi-word named entities into individual words
     for ent in doc.ents:
-        entity = ent.text.lower()
-        if ent.label_ in {'ORG', 'PERSON', 'GPE', 'LANGUAGE', 'PRODUCT'} and is_valid_keyword(entity):
-            keywords.add(entity)
+        words = ent.text.lower().split()
+        if ent.label_ in {'ORG', 'PERSON', 'GPE', 'LANGUAGE', 'PRODUCT'}:
+            for word in words:
+                if is_valid_keyword(word):
+                    keywords.add(word)
     
     # Remove overlapping keywords
     filtered_keywords = set()
