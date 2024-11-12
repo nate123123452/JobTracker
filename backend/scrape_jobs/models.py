@@ -1,20 +1,14 @@
 from django.db import models
+from django.utils import timezone
 
-class JobListing(models.Model):
-    job_name = models.CharField(max_length=255, default='N/A')
-    website = models.URLField(default='N/A')
-    text = models.TextField(default='N/A')
-    keywords = models.TextField(default='')  # TextField to store keywords as a string
-
-    def __str__(self):
-        return self.job_name
-
-class ResumeListing(models.Model):
-    text = models.TextField(default='N/A')
-    keywords = models.TextField(default='')  # TextField to store keywords as a string
+class Resume(models.Model):
+    title = models.TextField(max_length=255, default='N/A')
+    upload_date = models.DateTimeField(default=timezone.now)
+    description = models.TextField(blank=True, null=True, default='N/A')
+    document = models.FileField(null = True, upload_to='resumes/')
 
     def __str__(self):
-        return self.text[:50]
+        return self.title
 
 class Job(models.Model):
     STATUS_CHOICES = [
