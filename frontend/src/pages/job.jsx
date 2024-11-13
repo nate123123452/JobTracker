@@ -23,7 +23,7 @@ const JobDashboard = () => {
   // Fetch jobs from the backend
   useEffect(() => {
     axios
-      .get('http://localhost:8000/api')
+      .get('http://localhost:8000/api/jobs/')
       .then((response) => {
         setJobs(response.data || []);
       })
