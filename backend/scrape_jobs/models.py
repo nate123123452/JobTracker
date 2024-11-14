@@ -24,12 +24,12 @@ class Job(models.Model):
         ('In Person', 'In Person'),
     ]
 
-    company = models.CharField(max_length=255)
-    title = models.CharField(max_length=255)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    company = models.CharField(blank=True, null=True, max_length=255, default='N/A')
+    title = models.CharField(blank=True, null=True, max_length=255, default='N/A')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
     site = models.URLField(blank=True, null=True)
     applied_date = models.DateField(null=True, blank=True)
-    location = models.CharField(max_length=50, choices=LOCATION_CHOICES)
+    location = models.CharField(max_length=50, choices=LOCATION_CHOICES, default='In Person')
     notes = models.TextField(blank=True, null=True)
     interview_dates = models.JSONField(default=list, null=True)
 
