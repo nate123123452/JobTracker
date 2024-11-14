@@ -44,9 +44,23 @@ const JobDashboard = () => {
   const handleAddOrUpdateJob = (e) => {
     e.preventDefault();
 
+    // Ensure all required fields are included
+    const requiredFields = ['company', 'title', 'status', 'location'];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        alert(`Please fill in the ${field} field.`);
+        return;
+      }
+    }
+
+    const data = { ...formData };
+    if (!data.applied_date) {
+      delete data.applied_date;
+    }
+
     if (isEditing) {
       axios
-        .put(`http://localhost:8000/api/jobs/${editingJobId}/`, formData)
+        .put(`http://localhost:8000/api/jobs/${editingJobId}/`, data)
         .then((response) => {
           const updatedJob = response.data;
           setJobs(
@@ -62,7 +76,7 @@ const JobDashboard = () => {
         });
     } else {
       axios
-        .post('http://localhost:8000/api/jobs/', formData)
+        .post('http://localhost:8000/api/jobs/', data)
         .then((response) => {
           setJobs([...jobs, response.data]);
         })
@@ -96,7 +110,10 @@ const JobDashboard = () => {
 
   const handleEditJob = (id) => {
     const jobToEdit = jobs.find((job) => job.id === id);
-    setFormData(jobToEdit);
+    setFormData({
+      ...jobToEdit,
+      interview_dates: jobToEdit.interview_dates || [],
+    });
     setIsEditing(true);
     setEditingJobId(id);
   };
@@ -110,7 +127,6 @@ const JobDashboard = () => {
       interview_dates: formattedDates.map((date) => date.format('YYYY-MM-DD')),
     });
   };
-  
 
   const filteredJobs = Array.isArray(jobs)
     ? jobs.filter((job) => {
@@ -152,7 +168,7 @@ const JobDashboard = () => {
             <option value="In Person">In Person</option>
           </select>
           <input type="url" name="site" value={formData.site} onChange={handleChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <input type="date" name="applied_date" value={formData.applied_date} onChange={handleChange} placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input type="date" name="applied_date" value={formData.applied_date} onChange={handleChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
           <div className="flex flex-col gap-4">
             <label className="text-lg font-semibold text-indigo-700">Interview Dates</label>
@@ -191,6 +207,7 @@ const JobDashboard = () => {
                   <th className="p-3">Applied Date</th>
                   <th className="p-3">Notes</th>
                   <th className="p-3">Interview Dates</th>
+                  <th className="p-3">Application Site URL</th>
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -204,6 +221,7 @@ const JobDashboard = () => {
                     <td className="p-3">{job.applied_date}</td>
                     <td className="p-3">{job.notes}</td>
                     <td className="p-3">{job.interview_dates ? job.interview_dates.join(', ') : 'N/A'}</td>
+                    <td className="p-3"><a href={job.site} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800">{job.site}</a></td>
                     <td className="p-3 flex space-x-2">
                       <button onClick={() => handleEditJob(job.id)} className="text-blue-600 hover:text-blue-800 focus:outline-none">Edit</button>
                       <button onClick={() => handleDeleteJob(job.id)} className="text-red-600 hover:text-red-800 focus:outline-none">Delete</button>

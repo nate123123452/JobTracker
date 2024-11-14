@@ -136,7 +136,7 @@ const Resume = () => {
             onClick={handleDivClick}
           >
             <FaCloudUploadAlt className="text-indigo-500 mb-3" size={50} />
-            <p className="text-indigo-500 text-center">Drag and drop or click to upload</p>
+            <p className="text-indigo-500 text-center">Drag and drop</p>
             <p className="text-indigo-500 text-center">PDF Files only</p>
             <input
               type="file"
