@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import MultiDatePicker from 'react-multi-date-picker';
 import { motion } from 'framer-motion';
 
 const JobDashboard = () => {
@@ -19,6 +18,7 @@ const JobDashboard = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingJobId, setEditingJobId] = useState(null);
+  const [visibleInterviews, setVisibleInterviews] = useState({});
 
   // Fetch jobs from the backend
   useEffect(() => {
@@ -118,14 +118,36 @@ const JobDashboard = () => {
     setEditingJobId(id);
   };
 
-  const handleInterviewDateChange = (dates) => {
-    // Ensure dates is an array before calling map
-    const formattedDates = Array.isArray(dates) ? dates : [dates];
-    
+  const handleInterviewDateChange = (index, field, value) => {
+    const updatedInterviewDates = formData.interview_dates.map((interview, i) => {
+      if (i === index) {
+        return { ...interview, [field]: value };
+      }
+      return interview;
+    });
+    setFormData({ ...formData, interview_dates: updatedInterviewDates });
+  };
+
+  const addInterviewDate = () => {
     setFormData({
       ...formData,
-      interview_dates: formattedDates.map((date) => date.format('YYYY-MM-DD')),
+      interview_dates: [
+        ...formData.interview_dates,
+        { description: '', startTime: '', endTime: '', location: '' },
+      ],
     });
+  };
+
+  const removeInterviewDate = (index) => {
+    const updatedInterviewDates = formData.interview_dates.filter((_, i) => i !== index);
+    setFormData({ ...formData, interview_dates: updatedInterviewDates });
+  };
+
+  const toggleInterviewsVisibility = (jobId) => {
+    setVisibleInterviews((prevState) => ({
+      ...prevState,
+      [jobId]: !prevState[jobId],
+    }));
   };
 
   const filteredJobs = Array.isArray(jobs)
@@ -170,12 +192,78 @@ const JobDashboard = () => {
           <input type="url" name="site" value={formData.site} onChange={handleChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <input type="date" name="applied_date" value={formData.applied_date} onChange={handleChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
-          <div className="flex flex-col gap-4">
+          
+          <div className="sm:col-span-2">
             <label className="text-lg font-semibold text-indigo-700">Interview Dates</label>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <MultiDatePicker value={formData.interview_dates} onChange={handleInterviewDateChange} placeholder="Select Interview Dates" inputClass="w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              <button type="button" onClick={() => setFormData({ ...formData, interview_dates: [] })} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none">Clear</button>
-            </div>
+            {formData.interview_dates.map((interview, index) => (
+              <div key={index} className="border border-gray-300 p-4 rounded-lg mb-4 bg-gray-50 shadow-sm">
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <textarea
+                    name="description"
+                    value={interview.description}
+                    onChange={(e) => handleInterviewDateChange(index, 'description', e.target.value)}
+                    placeholder="Description"
+                    className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Interview Date</label>
+                  <input
+                    type="date"
+                    value={interview.date}
+                    onChange={(e) => handleInterviewDateChange(index, 'date', e.target.value)}
+                    placeholder="Interview Date"
+                    className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Start Time</label>
+                  <input
+                    type="time"
+                    value={interview.startTime}
+                    onChange={(e) => handleInterviewDateChange(index, 'startTime', e.target.value)}
+                    placeholder="Start Time"
+                    className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700">End Time</label>
+                  <input
+                    type="time"
+                    value={interview.endTime}
+                    onChange={(e) => handleInterviewDateChange(index, 'endTime', e.target.value)}
+                    placeholder="End Time"
+                    className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-gray-700">Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={interview.location}
+                    onChange={(e) => handleInterviewDateChange(index, 'location', e.target.value)}
+                    placeholder="Location"
+                    className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeInterviewDate(index)}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addInterviewDate}
+              className="bg-indigo-600 text-white px-4 py-2 my-2 rounded-lg flex items-center hover:bg-indigo-700 focus:outline-none"
+            >
+              Add Interview Date
+            </button>
           </div>
         </div>
         <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">{isEditing ? 'Update Job' : 'Add Job'}</button>
@@ -220,7 +308,33 @@ const JobDashboard = () => {
                     <td className="p-3">{job.location}</td>
                     <td className="p-3">{job.applied_date}</td>
                     <td className="p-3">{job.notes}</td>
-                    <td className="p-3">{job.interview_dates ? job.interview_dates.join(', ') : 'N/A'}</td>
+                    <td className="p-3">
+                      <div className="flex flex-col">
+                        <button
+                          onClick={() => toggleInterviewsVisibility(job.id)}
+                          className="text-indigo-600 hover:text-indigo-800 focus:outline-none mb-2 custom-button"
+                        >
+                          {visibleInterviews[job.id] ? 'Hide Interviews' : 'Show Interviews'}
+                        </button>
+                        {visibleInterviews[job.id] && (
+                          <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+                            {job.interview_dates.map((interview, index) => {
+                              const startTime = new Date(`1970-01-01T${interview.startTime}`);
+                              const endTime = new Date(`1970-01-01T${interview.endTime}`);
+                              return (
+                                <div key={index} className="mb-2 border-b border-gray-200 pb-2">
+                                  <p className="text-sm"><strong>Description:</strong> {interview.description}</p>
+                                  <p className="text-sm"><strong>Date:</strong> {new Date(interview.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                  <p className="text-sm"><strong>Start:</strong> {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+                                  <p className="text-sm"><strong>End:</strong> {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+                                  <p className="text-sm"><strong>Location:</strong> {interview.location}</p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </td>
                     <td className="p-3"><a href={job.site} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800">{job.site}</a></td>
                     <td className="p-3 flex space-x-2">
                       <button onClick={() => handleEditJob(job.id)} className="text-blue-600 hover:text-blue-800 focus:outline-none">Edit</button>
