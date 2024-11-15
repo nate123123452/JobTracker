@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaCloudUploadAlt, FaDownload } from 'react-icons/fa';
 import axios from 'axios';
@@ -18,6 +18,11 @@ const Resume = () => {
   const fileInputRef = useRef(null);
 
   const zoomPluginInstance = zoomPlugin();
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

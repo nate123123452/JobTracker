@@ -1,11 +1,18 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { ReactTyped as Typed } from 'react-typed';
 import jobImage from '../assets/job.jpg';
 import resumeImage from '../assets/resume.png';
 import calendarImage from '../assets/calendar.jpg';
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom';  
 
 const HomePage = () => {
+  useEffect(() => {
+    console.log('Home component mounted');
+    return () => {
+      console.log('Home component unmounted');
+    };
+  }, []);
   return (
     <motion.div 
     initial={{ opacity: 0 }}
@@ -48,9 +55,11 @@ const HomePage = () => {
             <p className='text-lg text-gray-700'>
               Our platform allows you to track multiple applications, schedule interviews, and ensure you never miss an opportunity.
             </p>
-            <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
-              Add Job
-            </button>
+            <Link to='/jobs'>
+              <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
+                Add Jobs
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -67,9 +76,11 @@ const HomePage = () => {
             <p className='text-lg text-gray-700'>
               Upload, update, and monitor your resumes to stay prepared for job applications at any time.
             </p>
-            <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
-              Upload Resume
-            </button>
+            <Link to='/resumes'>
+              <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
+                Upload Resume
+              </button>
+            </Link>
           </div>
           <img
             src={resumeImage}
@@ -96,9 +107,11 @@ const HomePage = () => {
             <p className='text-lg text-gray-700'>
               Our Calendar Dashboard integrates all your job search activities so you can stay on top of your schedule and never miss an important event.
             </p>
-            <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
-              View Calendar
-            </button>
+            <Link to='/calendar'>
+              <button className='bg-black text-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto md:mx-0 py-3'>
+                View Calendar
+              </button>
+            </Link>
           </div>
         </div>
       </div>
