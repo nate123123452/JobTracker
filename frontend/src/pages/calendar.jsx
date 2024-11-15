@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import { motion } from 'framer-motion';
@@ -7,29 +7,38 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'; // Ensure this is im
 // Localizer for Big Calendar
 const localizer = momentLocalizer(moment);
 
-// Sample events
-const events = [
-  {
-    id: 0,
-    title: 'Interview with Company A',
-    allDay: true,
-    start: new Date(2024, 10, 12),
-    end: new Date(2024, 10, 12),
-    description: 'This is a full-day interview scheduled with Company A. Bring your resume.',
-    location: 'Company A Headquarters',
-  },
-  {
-    id: 1,
-    title: 'Interview with Company B',
-    start: new Date(2024, 10, 18, 10, 0), // 10:00 AM
-    end: new Date(2024, 10, 18, 11, 30),  // 11:30 AM
-    description: 'A technical interview with Company B. Prepare for coding challenges.',
-    location: 'Company B Office',
-  },
-];
-
 const CalendarView = () => {
+  const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/interview_dates/');
+        const data = await response.json();
+        console.log('Fetched data:', data); // Debugging line
+        const formattedEvents = data.map(interview => ({
+          id: interview.id,
+          title: `${interview.company} - ${interview.title}`,
+          start: new Date(`${interview.date}T${interview.startTime || '00:00:00'}`),
+          end: new Date(`${interview.date}T${interview.endTime || '23:59:59'}`),
+          description: interview.description,
+          location: interview.location,
+        }));
+        console.log('Formatted events:', formattedEvents); // Debugging line
+        setEvents(formattedEvents);
+      } catch (error) {
+        console.error('Error fetching interview dates:', error);
+      }
+    };
+
+    fetchInterviews();
+  }, []);
 
   // Handler when an event is clicked
   const handleSelectEvent = (event) => {
@@ -79,13 +88,13 @@ const CalendarView = () => {
         </div>
       )}
 
-      {/* Placeholder for interviews (you will fetch this later) */}
+      {/* Placeholder for interviews */}
       <div className="text-center mt-8">
         <p className="text-lg text-gray-600">View and manage your upcoming interview dates.</p>
       </div>
 
       {/* Custom styles for the calendar */}
-      <style jsx>{`
+      <style>{`
         /* Dark Gray Borders for all Calendar Elements */
         
         /* For Month View */
@@ -94,28 +103,26 @@ const CalendarView = () => {
           border-bottom: 2px solid #4A5568; /* Dark gray border between rows */
         }
 
-        /* For Week View */
+        /* For Week and Day Views */
         .rbc-week-view .rbc-time-column,
-        .rbc-week-view .rbc-day-slot {
-          border-right: 2px solid #4A5568; /* Dark gray border */
-          border-bottom: 2px solid #4A5568; /* Dark gray border between days */
-        }
-
-        /* For Day View */
+        .rbc-week-view .rbc-day-slot,
         .rbc-day-view .rbc-time-column,
         .rbc-day-view .rbc-day-slot {
-          border-right: 2px solid #4A5568; /* Dark gray border */
+          border-right: 2px solid #4A5568; /* Dark gray border between time columns */
           border-bottom: 2px solid #4A5568; /* Dark gray border between time slots */
         }
 
-        /* For Header Row (Day Names) */
-        .rbc-month-view .rbc-header,
-        .rbc-week-view .rbc-header,
-        .rbc-day-view .rbc-header {
-          background-color: #F7FAFC; /* Light background for the header */
+        /* Header Row Styling for All Views (Day Names) */
+        .rbc-header {
+          background-color: #F7FAFC; /* Light background for header */
           font-weight: bold;
-          color: #2D3748; /* Dark text for the header */
+          color: #2D3748; /* Dark text for header */
           border-bottom: 2px solid #4A5568; /* Dark gray border under the header */
+        }
+
+        /* For Agenda View */
+        .rbc-agenda-view .rbc-agenda-table tbody > tr > td {
+          border-top: 2px solid #4A5568; /* Dark gray border between agenda items */
         }
 
         /* Event Styling - Smaller Boxes */
@@ -129,6 +136,20 @@ const CalendarView = () => {
           white-space: nowrap; /* Prevent text overflow */
           overflow: hidden; /* Hide overflowing text */
           text-overflow: ellipsis; /* Add ellipsis if text is too long */
+        }
+
+        /* Style for all-day events */
+        .rbc-allday-cell .rbc-event {
+          height: 20px; /* Reduce height */
+          padding: 2px 6px; /* Add padding for compact look */
+          background-color: #E2E8F0; /* Light gray background for all-day events */
+          color: #2D3748; /* Dark text for better readability */
+          border-radius: 4px; /* Rounded corners */
+          border: 1px solid #A0AEC0; /* Light border */
+          font-size: 0.875rem; /* Smaller font size */
+          text-overflow: ellipsis; /* Add ellipsis if text is too long */
+          white-space: nowrap; /* Prevent text overflow */
+          overflow: hidden; /* Hide overflowing text */
         }
 
         /* Optional: Hover effect for events */

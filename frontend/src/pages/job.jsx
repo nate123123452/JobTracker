@@ -20,6 +20,11 @@ const JobDashboard = () => {
   const [editingJobId, setEditingJobId] = useState(null);
   const [visibleInterviews, setVisibleInterviews] = useState({});
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   // Fetch jobs from the backend
   useEffect(() => {
     axios
@@ -133,7 +138,7 @@ const JobDashboard = () => {
       ...formData,
       interview_dates: [
         ...formData.interview_dates,
-        { description: '', startTime: '', endTime: '', location: '' },
+        { description: '', date: '', startTime: '00:00', endTime: '00:00', location: 'TBD' },
       ],
     });
   };
@@ -324,7 +329,7 @@ const JobDashboard = () => {
                               return (
                                 <div key={index} className="mb-2 border-b border-gray-200 pb-2">
                                   <p className="text-sm"><strong>Description:</strong> {interview.description}</p>
-                                  <p className="text-sm"><strong>Date:</strong> {new Date(interview.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                  <p className="text-sm"><strong>Date:</strong> {new Date(new Date(interview.date).getTime() + new Date().getTimezoneOffset() * 60000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                   <p className="text-sm"><strong>Start:</strong> {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
                                   <p className="text-sm"><strong>End:</strong> {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
                                   <p className="text-sm"><strong>Location:</strong> {interview.location}</p>
