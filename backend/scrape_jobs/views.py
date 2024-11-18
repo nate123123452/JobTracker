@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout 
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 from .models import Job, Resume

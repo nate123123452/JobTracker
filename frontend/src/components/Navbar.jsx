@@ -16,6 +16,10 @@ const Navbar = () => {
         setIsModalOpen(!isModalOpen);
     };
 
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     // Close mobile menu on resize
     useEffect(() => {
         const handleResize = () => {
@@ -33,8 +37,7 @@ const Navbar = () => {
     }, []);
 
     return (
-        <div className='flex justify-between items-center h-24 w-full mx-auto px-16 mb-2 text-white 
-'>
+        <div className='flex justify-between items-center h-24 w-full mx-auto px-16 mb-2 text-white'>
             <Link to="/">
               <h1 className='w-full text-3xl font-bold text-[#00df9a] font-montserrat'>JobTracker</h1>
             </Link>
@@ -90,7 +93,7 @@ const Navbar = () => {
 
             {/* Modal for Login/Register */}
             <Modal isOpen={isModalOpen} onClose={toggleModal}>
-                <LoginForm />
+                <LoginForm onLoginSuccess={closeModal} />
             </Modal>                
         </div>
     );
