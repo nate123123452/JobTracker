@@ -5,10 +5,11 @@ import HomePage from './pages/home';
 import JobPage from './pages/job';
 import ResumePage from './pages/resume';
 import CalendarPage from './pages/calendar';
+import LoginForm from './components/LoginForm';
 
 function App() {
   return (
-    <Router> {/* Wrapping the application with Router */}
+    <Router>
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -16,6 +17,7 @@ function App() {
         <Route path="/resumes" element={<ResumePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
+      <LoginForm />
     </Router>
   );
 }

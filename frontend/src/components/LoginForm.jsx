@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const LoginForm = () => {
+const LoginForm = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
@@ -20,8 +22,7 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // Perform login logic here
-    const response = await fetch('/api/login/', {
+    const response = await fetch('http://localhost:8000/api/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,6 +32,8 @@ const LoginForm = () => {
 
     if (response.ok) {
       alert('Login successful');
+      onLoginSuccess()
+      navigate('/');
     } else {
       alert('Invalid credentials');
     }
@@ -47,7 +50,6 @@ const LoginForm = () => {
       return;
     }
     try {
-      // Perform registration logic here
       const response = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
         headers: {

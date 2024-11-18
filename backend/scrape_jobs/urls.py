@@ -13,6 +13,8 @@ urlpatterns = [
     path('upload_resume/', views.upload_resume, name='upload_resume'),
     path('interview_dates/', views.interview_dates, name='interview_dates'),
     path('register/', views.register, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
 
 # Serve media files during development
