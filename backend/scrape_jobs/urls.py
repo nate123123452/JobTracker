@@ -10,7 +10,9 @@ router.register(r'resumes', views.ResumeViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),  # Base path for API should be set here
-    path('upload_resume/', views.upload_resume, name='upload_resume')
+    path('upload_resume/', views.upload_resume, name='upload_resume'),
+    path('interview_dates/', views.interview_dates, name='interview_dates'),
+    path('register/', views.register, name='register'),
 ]
 
 # Serve media files during development
