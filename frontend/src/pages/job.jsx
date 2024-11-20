@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api'; // Import the api instance
 import { motion } from 'framer-motion';
 
 const JobDashboard = () => {
@@ -27,18 +27,18 @@ const JobDashboard = () => {
   
   // Fetch jobs from the backend
   useEffect(() => {
-    axios
-      .get('http://localhost:8000/api/jobs/')
-      .then((response) => {
-        setJobs(response.data || []);
-      })
-      .catch((error) => {
-        console.error('There was an error fetching the jobs!', error);
-        setJobs([]);
-      });
+    const fetchJobs = async () => {
+      try {
+        const response = await api.get('/api/jobs/');
+        setJobs(response.data);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      }
+    };
+    fetchJobs();
   }, []);
 
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -46,7 +46,7 @@ const JobDashboard = () => {
     });
   };
 
-  const handleAddOrUpdateJob = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     // Ensure all required fields are included
@@ -64,30 +64,26 @@ const JobDashboard = () => {
     }
 
     if (isEditing) {
-      axios
-        .put(`http://localhost:8000/api/jobs/${editingJobId}/`, data)
-        .then((response) => {
-          const updatedJob = response.data;
-          setJobs(
-            jobs.map((job) =>
-              job.id === editingJobId ? { ...updatedJob } : job
-            )
-          );
-          setIsEditing(false);
-          setEditingJobId(null);
-        })
-        .catch((error) => {
-          console.error('Error updating job:', error);
-        });
+      try {
+        const response = await api.put(`/api/jobs/${editingJobId}/`, data);
+        const updatedJob = response.data;
+        setJobs(
+          jobs.map((job) =>
+            job.id === editingJobId ? { ...updatedJob } : job
+          )
+        );
+        setIsEditing(false);
+        setEditingJobId(null);
+      } catch (error) {
+        console.error('Error updating job:', error);
+      }
     } else {
-      axios
-        .post('http://localhost:8000/api/jobs/', data)
-        .then((response) => {
-          setJobs([...jobs, response.data]);
-        })
-        .catch((error) => {
-          console.error('Error adding job:', error);
-        });
+      try {
+        const response = await api.post('/api/jobs/', data);
+        setJobs([...jobs, response.data]);
+      } catch (error) {
+        console.error('Error adding job:', error);
+      }
     }
 
     setFormData({
@@ -102,15 +98,13 @@ const JobDashboard = () => {
     });
   };
 
-  const handleDeleteJob = (id) => {
-    axios
-      .delete(`http://localhost:8000/api/jobs/${id}/`)
-      .then(() => {
-        setJobs(jobs.filter((job) => job.id !== id));
-      })
-      .catch((error) => {
-        console.error('Error deleting job:', error);
-      });
+  const handleDeleteJob = async (id) => {
+    try {
+      await api.delete(`/api/jobs/${id}/`);
+      setJobs(jobs.filter((job) => job.id !== id));
+    } catch (error) {
+      console.error('Error deleting job:', error);
+    }
   };
 
   const handleEditJob = (id) => {
@@ -176,27 +170,27 @@ const JobDashboard = () => {
       <h1 className="text-3xl font-extrabold text-center text-indigo-800 mb-8">Job Dashboard</h1>
 
       {/* Job Form */}
-      <form onSubmit={handleAddOrUpdateJob} className="mb-8 bg-white p-6 rounded-lg shadow-xl space-y-6">
+      <form onSubmit={handleFormSubmit} className="mb-8 bg-white p-6 rounded-lg shadow-xl space-y-6">
         <h2 className="text-2xl font-semibold text-indigo-700">{isEditing ? 'Edit Job' : 'Add a New Job'}</h2>
         <div className="grid grid-cols-2 gap-6">
-          <input type="text" name="company" value={formData.company} onChange={handleChange} placeholder="Company Name" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-          <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Job Title" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-          <select name="status" value={formData.status} onChange={handleChange} className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          <input type="text" name="company" value={formData.company} onChange={handleInputChange} placeholder="Company Name" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+          <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="Job Title" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
+          <select name="status" value={formData.status} onChange={handleInputChange} className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
             <option value="">Select Status</option>
             <option value="Applied">Applied</option>
             <option value="In Progress">In Progress</option>
             <option value="Offered">Offered</option>
             <option value="Rejected">Rejected</option>
           </select>
-          <select name="location" value={formData.location} onChange={handleChange} className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+          <select name="location" value={formData.location} onChange={handleInputChange} className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
             <option value="">Type</option>
             <option value="Remote">Remote</option>
             <option value="Hybrid">Hybrid</option>
             <option value="In Person">In Person</option>
           </select>
-          <input type="url" name="site" value={formData.site} onChange={handleChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <input type="date" name="applied_date" value={formData.applied_date} onChange={handleChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
+          <input type="url" name="site" value={formData.site} onChange={handleInputChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input type="date" name="applied_date" value={formData.applied_date} onChange={handleInputChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <textarea name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
           
           <div className="sm:col-span-2">
             <label className="text-lg font-semibold text-indigo-700">Interview Dates</label>

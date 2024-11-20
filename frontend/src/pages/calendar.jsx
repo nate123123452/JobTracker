@@ -3,6 +3,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import { motion } from 'framer-motion';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // Ensure this is imported
+import api from '../services/api'; // Import the api instance
 
 // Localizer for Big Calendar
 const localizer = momentLocalizer(moment);
@@ -19,8 +20,8 @@ const CalendarView = () => {
   useEffect(() => {
     const fetchInterviews = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/interview_dates/');
-        const data = await response.json();
+        const response = await api.get('/api/interview_dates/');
+        const data = response.data;
         console.log('Fetched data:', data); // Debugging line
         const formattedEvents = data.map(interview => ({
           id: interview.id,

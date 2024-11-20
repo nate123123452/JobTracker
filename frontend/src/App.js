@@ -5,7 +5,8 @@ import HomePage from './pages/home';
 import JobPage from './pages/job';
 import ResumePage from './pages/resume';
 import CalendarPage from './pages/calendar';
-import LoginForm from './components/LoginForm';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         <Route path="/resumes" element={<ResumePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
-      <LoginForm />
+      <ToastContainer position="top-center" autoClose={1500} />
     </Router>
   );
 }

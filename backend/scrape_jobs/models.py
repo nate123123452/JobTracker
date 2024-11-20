@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Resume(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     title = models.TextField(max_length=255, default='N/A')
     upload_date = models.DateTimeField(default=timezone.now)
     description = models.TextField(blank=True, null=True, default='N/A')
@@ -26,7 +26,7 @@ class Job(models.Model):
         ('In Person', 'In Person'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     company = models.CharField(blank=True, null=True, max_length=255, default='N/A')
     title = models.CharField(blank=True, null=True, max_length=255, default='N/A')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
