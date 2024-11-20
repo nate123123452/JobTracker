@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineClose, AiOutlineMenu, AiOutlineUser } from 'react-icons/ai';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Modal from './Modal';
 import LoginForm from './LoginForm';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
@@ -12,8 +12,10 @@ const Navbar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showLogout, setShowLogout] = useState(false);
     const [username, setUsername] = useState('');
+    const dropdownRef = useRef(null);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleNav = () => setNav(!nav);
     const toggleModal = () => setIsModalOpen(!isModalOpen);
@@ -26,11 +28,6 @@ const Navbar = () => {
         localStorage.setItem('username', username);
         closeModal();
         setNav(false);
-
-        toast.success(`Welcome back, ${username}!`, {
-            position: 'top-center',
-            autoClose: 1500,
-        });
     };
 
     const handleLogout = () => {
@@ -67,8 +64,31 @@ const Navbar = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowLogout(false);
+            }
+        };
+
+        if (showLogout) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showLogout]);
+
+    const getLinkClass = (path) => {
+        return location.pathname === path ? 'text-[#00df9a]' : 'hover:text-[#00df9a]';
+    };
+
     return (
         <div className='relative'>
+            <ToastContainer />
             <div className='flex justify-between items-center h-24 w-full mx-auto px-16 mb-2 text-white'>
                 <Link to="/">
                     <h1 className='w-full text-3xl font-bold text-[#00df9a] font-montserrat'>JobTracker</h1>
@@ -76,16 +96,16 @@ const Navbar = () => {
 
                 {/* Desktop Navigation */}
                 <ul className='hidden md:flex items-center'>
-                    <li className='p-4 hover:text-[#00df9a]'>
+                    <li className={`p-4 ${getLinkClass('/')}`}>
                         <Link to="/" className='font-montserrat'>Home</Link>
                     </li>
-                    <li className='p-4 hover:text-[#00df9a]'>
+                    <li className={`p-4 ${getLinkClass('/jobs')}`}>
                         <Link to="/jobs" className='font-montserrat'>Jobs</Link>
                     </li>
-                    <li className='p-4 hover:text-[#00df9a]'>
+                    <li className={`p-4 ${getLinkClass('/resumes')}`}>
                         <Link to="/resumes" className='font-montserrat'>Resumes</Link>
                     </li>
-                    <li className='p-4 hover:text-[#00df9a]'>
+                    <li className={`p-4 ${getLinkClass('/calendar')}`}>
                         <Link to="/calendar" className='font-montserrat'>Calendar</Link>
                     </li>
                     <li className='p-4 relative'>
@@ -99,12 +119,12 @@ const Navbar = () => {
                                 </div>
                                 {showLogout && (
                                     <div
+                                        ref={dropdownRef}
                                         className="absolute right-4 mt-2 w-48 bg-white text-black rounded-lg shadow-lg transition-all ease-in-out duration-300 z-50"
-                                        onClick={() => setShowLogout(false)}
                                     >
                                         <div className="px-4 py-2 text-sm">
                                             <span className="block text-[#00df9a]">Logged in as:</span>
-                                            <span className="font-bold">{username}</span>
+                                            <span className="font-bold max-w-[100px] overflow-hidden text-overflow-ellipsis whitespace-nowrap">{username}</span>
                                         </div>
                                         <hr className="border-gray-700" />
                                         <button
@@ -150,16 +170,16 @@ const Navbar = () => {
                             Logged in as: {username}
                         </li>
                     )}
-                    <li className='p-4 border-b border-gray-600 hover:text-[#00df9a]'>
+                    <li className={`p-4 border-b border-gray-600 ${getLinkClass('/')}`}>
                         <Link to="/" onClick={handleNav} className='font-roboto'>Home</Link>
                     </li>
-                    <li className='p-4 border-b border-gray-600 hover:text-[#00df9a]'>
+                    <li className={`p-4 border-b border-gray-600 ${getLinkClass('/jobs')}`}>
                         <Link to="/jobs" onClick={handleNav} className='font-roboto'>Jobs</Link>
                     </li>
-                    <li className='p-4 border-b border-gray-600 hover:text-[#00df9a]'>
+                    <li className={`p-4 border-b border-gray-600 ${getLinkClass('/resumes')}`}>
                         <Link to="/resumes" onClick={handleNav} className='font-roboto'>Resumes</Link>
                     </li>
-                    <li className='p-4 border-b border-gray-600 hover:text-[#00df9a]'>
+                    <li className={`p-4 border-b border-gray-600 ${getLinkClass('/calendar')}`}>
                         <Link to="/calendar" onClick={handleNav} className='font-roboto'>Calendar</Link>
                     </li>
                     <li className='p-4'>
