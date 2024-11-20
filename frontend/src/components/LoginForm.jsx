@@ -38,6 +38,10 @@ const LoginForm = ({ onLoginSuccess }) => {
       localStorage.setItem('refresh_token', data.refresh);  
       onLoginSuccess(username);
       navigate('/');
+      toast.success(`Welcome back, ${username}!`, {
+        position: 'top-center',
+        autoClose: 1500,
+    });
     } else {
       setError('Invalid credentials');
       setTimeout(() => {
