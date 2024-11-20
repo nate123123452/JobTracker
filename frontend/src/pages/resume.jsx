@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaCloudUploadAlt, FaDownload } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../services/api'; // Import the api instance
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -23,6 +23,19 @@ const Resume = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    const fetchResumes = async () => {
+      try {
+        const response = await api.get('/api/resumes/');
+        setUploadedResumes(response.data);
+      } catch (error) {
+        console.error('Error fetching resumes:', error);
+      }
+    };
+    fetchResumes();
+  }, []);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,10 +89,8 @@ const Resume = () => {
     data.append('description', formData.description || 'N/A');
     data.append('document', formData.document);
 
-    console.log('Form data:', formData); // Debugging
-
     try {
-      const response = await axios.post('http://localhost:8000/api/upload_resume/', data, {
+      const response = await api.post('/api/upload_resume/', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -94,7 +105,7 @@ const Resume = () => {
           title: response.data.title,
           description: response.data.description,
           date: new Date(response.data.upload_date).toLocaleDateString(),
-          document: URL.createObjectURL(formData.document),
+          document: response.data.document,
           fileName: formData.fileName,
         },
       ]);
