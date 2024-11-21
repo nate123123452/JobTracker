@@ -3,7 +3,7 @@ import { AiOutlineClose, AiOutlineMenu, AiOutlineUser } from 'react-icons/ai';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Modal from './Modal';
 import LoginForm from './LoginForm';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
@@ -13,6 +13,7 @@ const Navbar = () => {
     const [showLogout, setShowLogout] = useState(false);
     const [username, setUsername] = useState('');
     const dropdownRef = useRef(null);
+    const navRef = useRef(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -69,18 +70,17 @@ const Navbar = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowLogout(false);
             }
+            if (navRef.current && !navRef.current.contains(event.target)) {
+                setNav(false);
+            }
         };
 
-        if (showLogout) {
-            document.addEventListener('mousedown', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
+        document.addEventListener('mousedown', handleClickOutside);
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [showLogout]);
+    }, [showLogout, nav]);
 
     const getLinkClass = (path) => {
         return location.pathname === path ? 'text-[#00df9a]' : 'hover:text-[#00df9a]';
@@ -88,7 +88,6 @@ const Navbar = () => {
 
     return (
         <div className='relative'>
-            <ToastContainer />
             <div className='flex justify-between items-center h-24 w-full mx-auto px-16 mb-2 text-white'>
                 <Link to="/">
                     <h1 className='w-full text-3xl font-bold text-[#00df9a] font-montserrat'>JobTracker</h1>
@@ -155,6 +154,7 @@ const Navbar = () => {
 
             {/* Mobile Navigation */}
             <div
+                ref={navRef}
                 className={
                     nav
                         ? 'fixed left-0 top-0 w-[60%] h-full border-r border-r-gray-900 bg-[#000300] ease-in-out duration-500 z-50'

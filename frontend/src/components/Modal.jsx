@@ -10,7 +10,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       }
     };
 
-   if (isOpen) {
+    if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);

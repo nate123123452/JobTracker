@@ -56,7 +56,6 @@ const Resume = () => {
     e.preventDefault();  // Prevent default behavior (open as link for some elements)
     const file = e.dataTransfer.files[0];
     if (file && file.type === 'application/pdf') {
-      console.log("File dropped:", file); // Debugging
       setFormData((prevData) => ({ ...prevData, document: file, fileName: file.name }));
     } else {
       alert('Please upload a PDF file.');
@@ -70,7 +69,6 @@ const Resume = () => {
   const handleDivClick = (e) => {
     e.preventDefault(); // Prevent default behavior (open as link for some elements)
     e.stopPropagation(); // Stop event propagation
-    console.log("Div clicked"); // Debugging
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -95,8 +93,6 @@ const Resume = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      console.log('Server response:', response.data); // Debugging
 
       setUploadedResumes((prevResumes) => [
         ...prevResumes,

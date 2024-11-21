@@ -169,3 +169,5 @@ import os
 # Define Media Files Setting
 MEDIA_URL = '/media/' # URL to access media files 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # File system path to store media files
+
+X_FRAME_OPTIONS = 'ALLOW-FROM http://127.0.0.1:8000/'

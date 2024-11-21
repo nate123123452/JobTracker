@@ -3,7 +3,7 @@ from .models import Resume, Job
 
 # Resume Admin
 class ResumeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'upload_date', 'description', 'document')  # Columns to display
+    list_display = ('title', 'user', 'upload_date', 'description', 'document')  # Columns to display
     search_fields = ('title', 'description')  # Fields to search by
     list_filter = ('upload_date',)  # Add filters on the right sidebar
     ordering = ('-upload_date',)  # Order by upload date, newest first
