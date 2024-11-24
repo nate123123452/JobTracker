@@ -8,7 +8,7 @@ class Resume(models.Model):
     upload_date = models.DateTimeField(default=timezone.now)
     description = models.TextField(blank=True, null=True, default='N/A')
     document = models.FileField(null = True, upload_to='resumes/')
-
+    
     def __str__(self):
         return self.title
 
