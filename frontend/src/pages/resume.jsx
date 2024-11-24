@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaCloudUploadAlt, FaDownload } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaDownload, FaTrashAlt } from 'react-icons/fa';
 import api from '../services/api'; // Import the api instance
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Resume = () => {
   const [uploadedResumes, setUploadedResumes] = useState([]);
@@ -101,10 +103,11 @@ const Resume = () => {
           title: response.data.title,
           description: response.data.description,
           date: new Date(response.data.upload_date).toLocaleDateString(),
-          document: response.data.document,
+          document: URL.createObjectURL(formData.document),
           fileName: formData.fileName,
         },
       ]);
+      toast.success('Resume uploaded successfully!', { autoClose: 1500 });
 
       setFormData({ title: '', description: '', document: null, fileName: '' });
     } catch (error) {
@@ -112,6 +115,17 @@ const Resume = () => {
       alert('Failed to upload resume. Please try again.');
     }
   };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/resumes/${id}/`);
+      setUploadedResumes((prevResumes) => prevResumes.filter((resume) => resume.id !== id));
+      toast.success('Resume deleted successfully!', { autoClose: 1500 });
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+      alert('Failed to delete resume. Please try again.');
+    }
+  }
 
   return (
     <motion.div
@@ -197,6 +211,13 @@ const Resume = () => {
                 <FaDownload className="mr-2" />
                 Download
               </a>
+              <button
+                onClick={() => handleDelete(resume.id)}
+                className="mt-2 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 hover:bg-red-700 flex items-center"
+              >
+                <FaTrashAlt className="mr-2" />
+                Delete
+              </button>
             </div>
           ))}
         </div>

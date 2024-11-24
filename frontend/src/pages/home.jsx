@@ -1,18 +1,22 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { ReactTyped as Typed } from 'react-typed';
 import jobImage from '../assets/job.jpg';
 import resumeImage from '../assets/resume.png';
 import calendarImage from '../assets/calendar.jpg';
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom';  
+import Modal from '../components/Modal';
+import LoginForm from '../components/LoginForm';
 
 const HomePage = () => {
-  useEffect(() => {
-    console.log('Home component mounted');
-    return () => {
-      console.log('Home component unmounted');
-    };
-  }, []);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
+
+  const handleLoginSuccess = () => {
+    toggleModal();
+  }
+
   return (
     <motion.div 
     initial={{ opacity: 0 }}
@@ -35,7 +39,7 @@ const HomePage = () => {
           />
         </div>
         <p className='md:text-2xl text-xl font-bold text-gray-500'>Track, schedule, and manage your job search with ease</p>
-        <button className='bg-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto py-3 text-black'>Get Started</button>
+        <button onClick={toggleModal} className='bg-[#00df9a] w-[200px] rounded-md font-medium my-6 mx-auto py-3 text-black'>Get Started</button>
       </div>
 
       {/* Jobs Section */}
@@ -115,6 +119,10 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={toggleModal}>
+        <LoginForm onLoginSuccess={handleLoginSuccess} />
+      </Modal>
     </motion.div>
   );
 };

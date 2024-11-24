@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api'; // Import the api instance
 import { motion } from 'framer-motion';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const JobDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -74,6 +76,7 @@ const JobDashboard = () => {
         );
         setIsEditing(false);
         setEditingJobId(null);
+        toast.success('Job updated successfully!');
       } catch (error) {
         console.error('Error updating job:', error);
       }
@@ -81,6 +84,7 @@ const JobDashboard = () => {
       try {
         const response = await api.post('/api/jobs/', data);
         setJobs([...jobs, response.data]);
+        toast.success('Job added successfully!');
       } catch (error) {
         console.error('Error adding job:', error);
       }
@@ -102,6 +106,7 @@ const JobDashboard = () => {
     try {
       await api.delete(`/api/jobs/${id}/`);
       setJobs(jobs.filter((job) => job.id !== id));
+      toast.success('Job deleted successfully!');
     } catch (error) {
       console.error('Error deleting job:', error);
     }
@@ -135,11 +140,13 @@ const JobDashboard = () => {
         { description: '', date: '', startTime: '00:00', endTime: '00:00', location: 'TBD' },
       ],
     });
+    toast.info('Interview date added successfully!');
   };
 
   const removeInterviewDate = (index) => {
     const updatedInterviewDates = formData.interview_dates.filter((_, i) => i !== index);
     setFormData({ ...formData, interview_dates: updatedInterviewDates });
+    toast.info('Interview date removed successfully!');
   };
 
   const toggleInterviewsVisibility = (jobId) => {

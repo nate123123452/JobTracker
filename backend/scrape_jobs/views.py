@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.utils import timezone
 from .models import Job, Resume
@@ -29,6 +29,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
@@ -64,6 +65,7 @@ def upload_resume(request):
         upload_date=timezone.now(),
         document=document
     )
+    print(f"Resume saved: {resume.document.path}")  # Debugging
 
     # Serialize and return saved data
     serializer = ResumeSerializer(resume)
