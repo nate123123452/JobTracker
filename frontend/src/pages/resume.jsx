@@ -112,7 +112,7 @@ const Resume = () => {
       setFormData({ title: '', description: '', document: null, fileName: '' });
     } catch (error) {
       console.error('Error uploading resume:', error);
-      alert('Failed to upload resume. Please try again.');
+      toast.error('Login To Upload a Resume');
     }
   };
 

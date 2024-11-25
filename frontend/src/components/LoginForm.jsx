@@ -14,6 +14,15 @@ const LoginForm = ({ onLoginSuccess }) => {
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
+    resetFormFields();
+    setError('');
+  };
+
+  const resetFormFields = () => { 
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    setEmail('');
     setError('');
   };
 
@@ -54,6 +63,9 @@ const LoginForm = ({ onLoginSuccess }) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setTimeout(() => {
+        setError('');
+      }, 2000);
       return;
     }
     if (!validateEmail(email)) {
