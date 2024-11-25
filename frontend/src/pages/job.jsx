@@ -86,7 +86,7 @@ const JobDashboard = () => {
         setJobs([...jobs, response.data]);
         toast.success('Job added successfully!');
       } catch (error) {
-        console.error('Error adding job:', error);
+        toast.error('Login To Add a Job');
       }
     }
 

@@ -1,51 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AiOutlineClose, AiOutlineMenu, AiOutlineUser } from 'react-icons/ai';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Modal from './Modal';
 import LoginForm from './LoginForm';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const Navbar = () => {
+
+const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUsername, handleLogout, toggleModal, isModelOpen }) => {
     const [nav, setNav] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showLogout, setShowLogout] = useState(false);
-    const [username, setUsername] = useState('');
     const dropdownRef = useRef(null);
     const navRef = useRef(null);
-
+    const modalRef = useRef(null);
     const navigate = useNavigate();
+
     const location = useLocation();
 
     const handleNav = () => setNav(!nav);
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
-    const closeModal = () => setIsModalOpen(false);
 
-    const handleLoginSuccess = (username) => {
-        setIsLoggedIn(true);
-        setUsername(username);
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
-        closeModal();
-        setNav(false);
+    const handleLoginSuccessLocal = () => {
+        handleLoginSuccess(username);
+        handleNav();
     };
 
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-        setShowLogout(false);
-        setUsername('');
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+    const handleLogoutMobile = () => {   
+        handleLogout();
+        handleNav();
         navigate('/');
-        setNav(false);
+    };
 
-        toast.success(`Logged Out Successfully!`, {
-            position: 'top-center',
-            autoClose: 1500,
-        });
+    const handleLogoutDesktop = () => {
+        handleLogout();
+        navigate('/');
     };
 
     useEffect(() => {
@@ -55,7 +40,7 @@ const Navbar = () => {
             setIsLoggedIn(true);
             setUsername(storedUsername);
         }
-    }, []);
+    }, [setIsLoggedIn, setUsername]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -67,6 +52,9 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
+            if (isModelOpen && modalRef.current && !modalRef.current.contains(event.target)){
+                return;
+            } 
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowLogout(false);
             }
@@ -80,7 +68,7 @@ const Navbar = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [showLogout, nav]);
+    }, [showLogout, nav, isModelOpen]);
 
     const getLinkClass = (path) => {
         return location.pathname === path ? 'text-[#00df9a]' : 'hover:text-[#00df9a]';
@@ -127,7 +115,7 @@ const Navbar = () => {
                                         </div>
                                         <hr className="border-gray-700" />
                                         <button
-                                            onClick={handleLogout}
+                                            onClick={handleLogoutDesktop}
                                             className="block px-4 py-2 text-sm hover:bg-red-600 transition-colors w-full text-left rounded-b text-red-500"
                                         >
                                             Logout
@@ -166,7 +154,7 @@ const Navbar = () => {
                 </Link>
                 <ul className='text-white uppercase p-4'>
                     {isLoggedIn && (
-                        <li className='p-4 text-[#00df9a] font-bold border-b border-gray-600'>
+                        <li className='p</Link>-4 text-[#00df9a] font-bold border-b border-gray-600'>
                             Logged in as: {username}
                         </li>
                     )}
@@ -185,7 +173,7 @@ const Navbar = () => {
                     <li className='p-4'>
                         {isLoggedIn ? (
                             <button
-                                onClick={handleLogout}
+                                onClick={handleLogoutMobile}
                                 className='font-montserrat bg-red-600 text-white px-4 py-2 rounded'
                             >
                                 Logout
@@ -202,8 +190,8 @@ const Navbar = () => {
                 </ul>
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={toggleModal}>
-                <LoginForm onLoginSuccess={handleLoginSuccess} />
+            <Modal isOpen={isModelOpen} onClose={toggleModal} ref={modalRef}>
+                <LoginForm onLoginSuccess={handleLoginSuccessLocal} />
             </Modal>
         </div>
     );
