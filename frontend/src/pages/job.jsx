@@ -173,6 +173,7 @@ const JobDashboard = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: 'easeInOut' }}
       className="max-w-6xl mx-7 lg:mx-8 xl:mx-auto p-6 sm:p-8 bg-gradient-to-r from-indigo-100 via-indigo-200 to-indigo-300 rounded-lg shadow-lg"
+      style={{ marginTop: '6rem' }}
     >
       <h1 className="text-3xl font-extrabold text-center text-indigo-800 mb-8">Job Dashboard</h1>
 
@@ -196,11 +197,12 @@ const JobDashboard = () => {
             <option value="In Person">In Person</option>
           </select>
           <input type="url" name="site" value={formData.site} onChange={handleInputChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <input type="date" name="applied_date" value={formData.applied_date} onChange={handleInputChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input type="text" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} name="applied_date" value={formData.applied_date} onChange={handleInputChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <textarea name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
-          
+
+          {/* Interview Dates */}
           <div className="sm:col-span-2">
-            <label className="text-lg font-semibold text-indigo-700">Interview Dates</label>
+            <label className="text-lg font-semibold text-indigo-700 text-center block">Interview Dates</label>
             {formData.interview_dates.map((interview, index) => (
               <div key={index} className="border border-gray-300 p-4 rounded-lg mb-4 bg-gray-50 shadow-sm">
                 <div className="mb-2">
@@ -254,22 +256,26 @@ const JobDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeInterviewDate(index)}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none"
-                >
-                  Remove
-                </button>
+                <div className='flex justify-between items-center'>
+                  <button
+                    type="button"
+                    onClick={() => removeInterviewDate(index)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none w-full flex justify-center"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={addInterviewDate}
-              className="bg-indigo-600 text-white px-4 py-2 my-2 rounded-lg flex items-center hover:bg-indigo-700 focus:outline-none"
-            >
-              Add Interview Date
-            </button>
+            <div className="flex justify-center items-center">
+              <button
+                type="button"
+                onClick={addInterviewDate}
+                className="bg-indigo-600 text-white px-4 py-2 my-2 rounded-lg flex items-center hover:bg-indigo-700 focus:outline-none"
+              >
+                Add Interview Date
+              </button>
+            </div>  
           </div>
         </div>
         <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">{isEditing ? 'Update Job' : 'Add Job'}</button>
