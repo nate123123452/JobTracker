@@ -134,6 +134,7 @@ const Resume = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1, ease: "easeInOut" }}
+      style={{ marginTop: '6rem' }}
     >
       <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-800">Resume Dashboard</h1>
 

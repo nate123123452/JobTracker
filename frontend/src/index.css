@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 body {
-  background-color: #000300;
+  background-color: #2d2d2d;
 }
+
+/* html {
+  overflow-x: auto;
+} */
