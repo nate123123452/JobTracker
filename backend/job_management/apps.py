@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ScrapeJobsConfig(AppConfig):
+class JobManagementConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'scrape_jobs'
+    name = 'job_management'

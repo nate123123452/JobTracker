@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scrape_jobs', '0004_job_user_resume_user'),
+        ('job_management', '0004_job_user_resume_user'),
     ]
 
     operations = [

@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', lambda request: HttpResponseRedirect('/api/')),  # Redirect root path to /api/
-    path('api/', include('scrape_jobs.urls')),  # Include URLs from the scrape_jobs app
+    path('api/', include('job_management.urls')),  # Include URLs from the job_management app
 ]
 
 # Serve media files during development
