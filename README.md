@@ -29,29 +29,37 @@ The Job Tracker Application is a full-stack web application designed to help use
    cd job-tracker/backend
 
 2. Create a virtual environment and activate it:
+   ```bash
    python -m venv venv
    source venv/bin/activate 
 
 3. Install the required packages
+   ```bash
    pip install -r requirements.txt
 
 4. Apply migrations:
+   ```bash
    python manage.py migrate
 
 5. Create a superuser:
+   ```bash
    python manage.py createsuperuser
 
 6. Run the development server
+   ```bash
    python manage.py runserver
 
 ### Frontend Setup
 1. Navigate to the frontend directory
+   ```bash
    cd ../frontend
 
 2. Install the required packages
+   ```bash
    npm install
 
 3. Start the development server
+   ```bash
    npm start
 
 ### Usage
@@ -83,4 +91,4 @@ The Job Tracker Application is a full-stack web application designed to help use
   - POST /api/token/refresh/: Refresh a JWT token
 
 ### Contact
-For any insuiries, please contact nathan.tran1717@gmail.com
+For any inquiries, please contact nathan.tran1717@gmail.com
