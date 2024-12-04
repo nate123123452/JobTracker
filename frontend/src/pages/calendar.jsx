@@ -4,6 +4,7 @@ import moment from 'moment';
 import { motion } from 'framer-motion';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // Ensure this is imported
 import api from '../services/api'; // Import the api instance
+import { toast } from 'react-toastify'; // Import the toast module
 
 // Localizer for Big Calendar
 const localizer = momentLocalizer(moment);
@@ -11,6 +12,42 @@ const localizer = momentLocalizer(moment);
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const handleSelectEvent = (event) => {
+    console.log('Selected event:', event);
+    setSelectedEvent({
+      ...event,
+      // Use existing compound ID or create new one
+      id: event.id || `${event.job_id}_${Date.now()}`,
+      job_id: event.job_id,
+      description: event.description || 'N/A',
+      date: event.start.toISOString().split('T')[0],
+      startTime: event.start.toISOString().split('T')[1].slice(0, 5),
+      endTime: event.end.toISOString().split('T')[1].slice(0, 5),
+      location: event.location || 'TBD',
+    });
+    window.scrollTo(0, document.body.scrollHeight);
+  };
+  
+  const handleDeleteInterview = async (job_id, interview_id) => {
+    if (!job_id || !interview_id) {
+      console.error('Job ID or Interview ID is undefined');
+      return;
+    }
+    try {
+      // Get the index from the compound ID (e.g., "25_0" -> "0")
+      const index = interview_id.split('_')[1];
+      
+      console.log(`Deleting interview: job_id=${job_id}, index=${index}`);
+      
+      await api.delete(`/api/jobs/${job_id}/interview_dates/${index}/`);
+      setEvents(prevEvents => prevEvents.filter(event => String(event.id) !== String(interview_id)));
+      toast.success('Interview date deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting interview date:', error);
+      toast.error('Failed to delete interview date. Please try again.');
+    }
+  };
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -22,29 +59,24 @@ const CalendarView = () => {
       try {
         const response = await api.get('/api/interview_dates/');
         const data = response.data;
-        console.log('Fetched data:', data); // Debugging line
         const formattedEvents = data.map(interview => ({
-          id: interview.id,
+          id: interview.id,            // Interview ID
+          job_id: interview.job_id,    // Job ID
           title: `${interview.company} - ${interview.title}`,
           start: new Date(`${interview.date}T${interview.startTime || '00:00:00'}`),
           end: new Date(`${interview.date}T${interview.endTime || '23:59:59'}`),
           description: interview.description,
           location: interview.location,
         }));
-        console.log('Formatted events:', formattedEvents); // Debugging line
         setEvents(formattedEvents);
       } catch (error) {
         console.error('Error fetching interview dates:', error);
       }
     };
-
+  
     fetchInterviews();
   }, []);
 
-  // Handler when an event is clicked
-  const handleSelectEvent = (event) => {
-    setSelectedEvent(event); // Store the selected event's details
-  };
 
   return (
     <motion.div
@@ -81,12 +113,25 @@ const CalendarView = () => {
           <p className="text-sm text-gray-500">{`End: ${moment(selectedEvent.end).format('MMMM Do YYYY, h:mm a')}`}</p>
           <div className="mt-4">
             <p className="text-lg font-semibold text-indigo-600">Description:</p>
-            <p className="text-gray-700">{selectedEvent.description}</p>
+            <p className="text-gray-700 overflow-auto break-words">{selectedEvent.description}</p>
           </div>
           <div className="mt-4">
             <p className="text-lg font-semibold text-indigo-600">Location:</p>
             <p className="text-gray-700">{selectedEvent.location}</p>
           </div>
+          <button
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600"
+            onClick={() => {
+              const interview_id = selectedEvent?.id || `${selectedEvent?.job_id}_${Date.now()}`;
+              if (selectedEvent?.job_id && interview_id) {
+                handleDeleteInterview(selectedEvent.job_id, interview_id);
+              } else {
+                toast.error('Cannot delete interview: missing required information');
+              }
+            }}
+          >
+            Delete Interview
+          </button>
         </div>
       )}
 

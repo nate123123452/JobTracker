@@ -3,6 +3,7 @@ import api from '../services/api'; // Import the api instance
 import { motion } from 'framer-motion';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 const JobDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -21,6 +22,7 @@ const JobDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingJobId, setEditingJobId] = useState(null);
   const [visibleInterviews, setVisibleInterviews] = useState({});
+  const [visibleJobs, setVisibleJobs] = useState(10);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -114,6 +116,8 @@ const JobDashboard = () => {
 
   const handleEditJob = (id) => {
     const jobToEdit = jobs.find((job) => job.id === id);
+    window.scrollTo(0, 0);
+    toast.info('Editing job...');
     setFormData({
       ...jobToEdit,
       interview_dates: jobToEdit.interview_dates || [],
@@ -137,7 +141,7 @@ const JobDashboard = () => {
       ...formData,
       interview_dates: [
         ...formData.interview_dates,
-        { description: '', date: '', startTime: '00:00', endTime: '00:00', location: 'TBD' },
+        { description: 'N/A', date: '', startTime: '00:00', endTime: '00:00', location: 'TBD' },
       ],
     });
     toast.info('Interview date added successfully!');
@@ -165,6 +169,10 @@ const JobDashboard = () => {
         );
       })
     : [];
+
+  const loadMoreJobs = () => {
+    setVisibleJobs((prevVisibleJobs) => prevVisibleJobs + 10);
+  }
 
   return (
     <motion.div
@@ -197,7 +205,22 @@ const JobDashboard = () => {
             <option value="In Person">In Person</option>
           </select>
           <input type="url" name="site" value={formData.site} onChange={handleInputChange} placeholder="Application Site URL" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <input type="text" onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'} name="applied_date" value={formData.applied_date} onChange={handleInputChange} id="date" placeholder="Applied Date" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <input 
+            type="text" 
+            onFocus={(e) => e.target.type = 'date'} 
+            onBlur={(e) => {
+              e.target.type = 'text';
+              if (e.target.value) {
+                e.target.value = moment(e.target.value).format('MM-DD-YYYY');
+              }
+            }}
+            name="applied_date" 
+            value={formData.applied_date} 
+            onChange={handleInputChange} 
+            id="date" 
+            placeholder="Applied Date" 
+            className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
           <textarea name="notes" value={formData.notes} onChange={handleInputChange} placeholder="Notes" className="p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:col-span-2"></textarea>
 
           {/* Interview Dates */}
@@ -206,7 +229,7 @@ const JobDashboard = () => {
             {formData.interview_dates.map((interview, index) => (
               <div key={index} className="border border-gray-300 p-4 rounded-lg mb-4 bg-gray-50 shadow-sm">
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 overflow-auto">Description</label>
                   <textarea
                     name="description"
                     value={interview.description}
@@ -300,6 +323,7 @@ const JobDashboard = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-indigo-600 text-white">
+                  <th className="p-3">#</th>
                   <th className="p-3">Company</th>
                   <th className="p-3">Title</th>
                   <th className="p-3">Status</th>
@@ -312,14 +336,16 @@ const JobDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredJobs.map((job) => (
+                {/* Display the first 10 jobs */}
+                {filteredJobs.slice(0, visibleJobs).map((job, index) => (
                   <tr key={job.id} className="border-t border-gray-300">
+                    <td className="p-3">{index + 1}</td>
                     <td className="p-3">{job.company}</td>
                     <td className="p-3">{job.title}</td>
                     <td className="p-3">{job.status}</td>
                     <td className="p-3">{job.location}</td>
-                    <td className="p-3">{job.applied_date}</td>
-                    <td className="p-3">{job.notes}</td>
+                    <td className="p-3">{moment(job.applied_date).format('MMMM DD, YYYY')}</td>
+                    <td className="p-3 overflow-auto whitespace-pre ">{job.notes}</td>
                     <td className="p-3">
                       <div className="flex flex-col">
                         <button
@@ -356,6 +382,16 @@ const JobDashboard = () => {
                 ))}
               </tbody>
             </table>
+            {visibleJobs < filteredJobs.length && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={loadMoreJobs}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 focus:outline-none"
+                >
+                  Show More
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-gray-700">No jobs found.</p>

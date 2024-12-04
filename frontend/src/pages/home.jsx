@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect }from 'react';
 import { ReactTyped as Typed } from 'react-typed';
 import jobImage from '../assets/job.jpg';
 import resumeImage from '../assets/resume.png';
@@ -25,6 +25,10 @@ const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
   const calendarRef = React.useRef(null);
   const isCalendarInView = useInView(calendarRef, { once: true });  
   
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <motion.div
@@ -35,7 +39,7 @@ const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
       className='overflow-hidden'
     >
       {/* Hero Section */}
-      <div className={`text-white w-full h-screen mx-auto text-center flex flex-col justify-center items-center bg-gradient-to-b from-gray-800 to-gray-900`}>
+      <div className={`text-white w-full h-screen mx-auto text-center flex flex-col justify-center items-center`}>
           <p className="text-[#586eff] font-bold p-2 text-xl">Land Your Dream Job</p>
           <h1 className="md:text-6xl sm:text-5xl text-4xl font-bold md:py-6">Manage Your Career</h1>
           <div className="flex justify-center items-center overflow-auto">

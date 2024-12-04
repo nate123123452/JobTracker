@@ -12,25 +12,28 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
     const navRef = useRef(null);
     const modalRef = useRef(null);
     const navigate = useNavigate();
-
     const location = useLocation();
+    const scrollToTop = () => window.scrollTo(0, 0);
 
     const handleNav = () => setNav(!nav);
 
     const handleLoginSuccessLocal = () => {
         handleLoginSuccess(username);
         handleNav();
+        scrollToTop();
     };
 
     const handleLogoutMobile = () => {   
         handleLogout();
         handleNav();
         navigate('/');
+        scrollToTop();
     };
 
     const handleLogoutDesktop = () => {
         handleLogout();
         navigate('/');
+        scrollToTop();
     };
 
     const handleLogoClick = () => {
