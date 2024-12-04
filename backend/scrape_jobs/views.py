@@ -105,19 +105,24 @@ from django.shortcuts import get_object_or_404
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_interview_date(request, job_id, interview_index):
-    # Access the request object to avoid compile error
-    user = request.user
-    # Get the job object
-    job = get_object_or_404(Job, pk=job_id)
-    
-    # Check if the interview index is within the bounds of the list
-    if interview_index < len(job.interview_dates):
+    try:
+        # Get the job object
+        job = get_object_or_404(Job, pk=job_id, user=request.user)
+        
+        # Check if the interview index is within the bounds of the list
+        if interview_index < 0 or interview_index >= len(job.interview_dates):
+            return JsonResponse({"error": "Interview date not found"}, status=400)
+        
         # Remove the interview date at the specified index
         del job.interview_dates[interview_index]
         
+        # Reindex the remaining interview dates
+        for idx, interview in enumerate(job.interview_dates):
+            interview['id'] = f"{job_id}_{idx}"
+        
         # Save the updated job object
-        job.save()
+        job.save(update_fields=['interview_dates'])
         
         return JsonResponse({"message": "Interview date deleted successfully"})
-    else:
-        return JsonResponse({"error": "Interview date not found"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
