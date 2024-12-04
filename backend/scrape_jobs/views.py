@@ -65,7 +65,6 @@ def upload_resume(request):
         upload_date=timezone.now(),
         document=document
     )
-    print(f"Resume saved: {resume.document.path}")  # Debugging
 
     # Serialize and return saved data
     serializer = ResumeSerializer(resume)
@@ -77,16 +76,48 @@ def interview_dates(request):
     jobs = Job.objects.filter(user=request.user)
     interviews = []
     for job in jobs:
-        for interview in job.interview_dates:
+        for index, interview in enumerate(job.interview_dates):
+            # Generate a compound ID if none exists
+            interview_id = interview.get('id') or f"{job.id}_{index}"
             interviews.append({
-                'id': job.id,
+                'id': interview_id,  # Ensure unique ID exists
+                'job_id': job.id,
                 'company': job.company,
                 'title': job.title,
                 'date': interview.get('date'),
                 'startTime': interview.get('startTime'),
                 'endTime': interview.get('endTime'),   
                 'description': interview.get('description'),
-                'location': interview.get('location'),
+                'location': interview.get('location', 'TBD'),
             })
+            
+            # Update the interview in job.interview_dates with the ID if it was missing
+            if not interview.get('id'):
+                interview['id'] = interview_id
+                job.save(update_fields=['interview_dates'])
+                
     return Response(interviews, status=status.HTTP_200_OK)
+
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_interview_date(request, job_id, interview_index):
+    # Access the request object to avoid compile error
+    user = request.user
+    # Get the job object
+    job = get_object_or_404(Job, pk=job_id)
+    
+    # Check if the interview index is within the bounds of the list
+    if interview_index < len(job.interview_dates):
+        # Remove the interview date at the specified index
+        del job.interview_dates[interview_index]
         
+        # Save the updated job object
+        job.save()
+        
+        return JsonResponse({"message": "Interview date deleted successfully"})
+    else:
+        return JsonResponse({"error": "Interview date not found"}, status=400)

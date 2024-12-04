@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Resume = () => {
   const [uploadedResumes, setUploadedResumes] = useState([]);
+  const [visibleResumes, setVisibleResumes] = useState(9);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -38,6 +39,9 @@ const Resume = () => {
     fetchResumes();
   }, []);
 
+  const loadMoreResumes = () => {
+    setVisibleResumes((prevVisible) => prevVisible + 9);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,10 +51,9 @@ const Resume = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
-      console.log("File selected:", file); // Debugging
       setFormData((prevData) => ({ ...prevData, document: file, fileName: file.name }));
     } else {
-      alert('Please upload a PDF file.');
+      toast.error('Please upload a PDF file.');
     }
   };
 
@@ -60,8 +63,7 @@ const Resume = () => {
     if (file && file.type === 'application/pdf') {
       setFormData((prevData) => ({ ...prevData, document: file, fileName: file.name }));
     } else {
-      alert('Please upload a PDF file.');
-    }
+      toast.error('Please upload a PDF file.');}
   };
 
   const handleDragOver = (e) => {
@@ -187,13 +189,14 @@ const Resume = () => {
           </button>
         </div>
       </form>
-
+      
+      {/*Resume Display*/}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-semibold mb-6 text-center text-indigo-700">Uploaded Resumes</h2>
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {uploadedResumes.map((resume) => (
+          {uploadedResumes.slice(0, visibleResumes).map((resume, index) => (
             <div
-              key={resume.id}
+              key={index}
               className="p-4 border border-gray-200 rounded-lg flex flex-col items-center bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md"
             >
               <div className="w-full h-96 mb-4 rounded-md overflow-hidden">
@@ -222,6 +225,14 @@ const Resume = () => {
             </div>
           ))}
         </div>
+        {visibleResumes < uploadedResumes.length && (
+          <button
+            onClick={loadMoreResumes}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 flex items-center mx-auto"
+          >
+            Load More
+          </button>
+        )}
       </div>
     </motion.div>
   );

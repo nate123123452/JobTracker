@@ -89,7 +89,10 @@ const LoginForm = ({ onLoginSuccess }) => {
         })
       } else {
         const errorData = await response.json();
-        setError(errorData.message || 'Registration failed');
+        setError(errorData.message || 'Username Taken, Registration Failed');
+        setTimeout(() => {
+          setError('');
+        }, 2000);
       }
     } catch (err) {
       setError('Fetch error: ' + err.message);
