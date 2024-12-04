@@ -37,13 +37,26 @@ const CalendarView = () => {
       return;
     }
     try {
-      // Get the index from the compound ID (e.g., "25_0" -> "0")
-      const index = interview_id.split('_')[1];
-      
+      const index = parseInt(interview_id.split('_')[1], 10);
       console.log(`Deleting interview: job_id=${job_id}, index=${index}`);
       
       await api.delete(`/api/jobs/${job_id}/interview_dates/${index}/`);
-      setEvents(prevEvents => prevEvents.filter(event => String(event.id) !== String(interview_id)));
+      
+      // Fetch updated interviews
+      const response = await api.get('/api/interview_dates/');
+      const updatedEvents = response.data.map(interview => ({
+        id: interview.id,
+        job_id: interview.job_id,
+        title: `${interview.company} - ${interview.title}`,
+        start: new Date(`${interview.date}T${interview.startTime || '00:00:00'}`),
+        end: new Date(`${interview.date}T${interview.endTime || '23:59:59'}`),
+        description: interview.description,
+        location: interview.location,
+      }));
+      setEvents(updatedEvents);
+      
+      // Clear selected event
+      setSelectedEvent(null);
       toast.success('Interview date deleted successfully!');
     } catch (error) {
       console.error('Error deleting interview date:', error);

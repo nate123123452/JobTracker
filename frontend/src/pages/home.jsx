@@ -45,8 +45,8 @@ const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
           <div className="flex justify-center items-center overflow-auto">
             <p className="md:text-5xl sm:text-4xl text-xl font-bold py-3 whitespace-nowrap">Keep Your Job Searches</p>
             <Typed
-              className="md:text-5xl sm:text-4xl text-2xl font-bold pl-2 whitespace-nowrap overflow-hidden max-w-full text-[#586eff]"
-              strings={['Planned', 'Managed', 'Tracked']}
+              className="md:text-5xl sm:text-4xl text-xl font-bold pl-1 whitespace-nowrap overflow-hidden max-w-full text-[#586eff]"
+              strings={['Organized', 'Scheduled', 'Tracked']}
               typeSpeed={100}
               backSpeed={100}
               loop
