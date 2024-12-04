@@ -25,8 +25,8 @@ The Job Tracker Application is a full-stack web application designed to help use
 ### Backend Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/job-tracker.git
-   cd job-tracker/backend
+   git clone https://github.com/yourusername/JobTracker.git
+   cd JobTracker/backend
 
 2. Create a virtual environment and activate it:
    ```bash
