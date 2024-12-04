@@ -26,7 +26,9 @@ const CalendarView = () => {
       endTime: event.end.toISOString().split('T')[1].slice(0, 5),
       location: event.location || 'TBD',
     });
-    window.scrollTo(0, document.body.scrollHeight);
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 0);
   };
   
   const handleDeleteInterview = async (job_id, interview_id) => {
