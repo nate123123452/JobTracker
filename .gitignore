@@ -1,8 +1,35 @@
+# Virtual Environment
 venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 get-pip.py
 
+# Database
 db.sqlite3
 
+# Frontend
 frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/build/
+frontend/.cache/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
+# Media
 backend/media/
+
+# IDE
+.vscode/
+.idea/
+
+# System Files
+.DS_Store
+Thumbs.db
