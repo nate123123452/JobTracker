@@ -5,32 +5,41 @@ from rest_framework.response import Response
 from django.utils import timezone
 from .models import Job, Resume
 from .serializers import JobSerializer, ResumeSerializer, UserSerializer
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 class JobViewSet(viewsets.ModelViewSet):
+    '''Handling Job CRUD operations'''
     serializer_class = JobSerializer
     permission_classes = [IsAuthenticated]
     queryset = Job.objects.all()
 
     def get_queryset(self):
+        '''Return jobs for the current user'''
         return Job.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        '''Save the user when creating a new job'''
         serializer.save(user=self.request.user)
 
 class ResumeViewSet(viewsets.ModelViewSet):
+    '''Handling Resume CRUD operations'''
     serializer_class = ResumeSerializer
     permission_classes = [IsAuthenticated]
     queryset = Resume.objects.all()
 
     def get_queryset(self):
+        '''Return resumes for the current user'''
         return Resume.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
+        '''Save the user when creating a new resume'''
         serializer.save(user=self.request.user)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
+    '''Endpoint for user registration'''
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
@@ -40,6 +49,7 @@ def register(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_resume(request):
+    '''Endpoint for uploading a resume'''
     document = request.FILES.get('document')
     title = request.data.get('title')
     description = request.data.get('description')
@@ -73,6 +83,7 @@ def upload_resume(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def interview_dates(request):
+    '''Endpoint for fetching all interview dates for the current user'''
     jobs = Job.objects.filter(user=request.user)
     interviews = []
     for job in jobs:
@@ -98,13 +109,10 @@ def interview_dates(request):
                 
     return Response(interviews, status=status.HTTP_200_OK)
 
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_interview_date(request, job_id, interview_index):
+    '''Endpoint for deleting an interview date for a job'''
     try:
         # Get the job object
         job = get_object_or_404(Job, pk=job_id, user=request.user)
