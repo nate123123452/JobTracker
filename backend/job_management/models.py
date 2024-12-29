@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Resume(models.Model):
+    '''Model representing a resume uploaded by a user'''
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     title = models.TextField(max_length=255, default='N/A')
     upload_date = models.DateTimeField(default=timezone.now)
@@ -13,6 +14,7 @@ class Resume(models.Model):
         return self.title
 
 class Job(models.Model):
+    '''Model representing a job application uploaded by a user'''
     STATUS_CHOICES = [
         ('Applied', 'Applied'),
         ('In Progress', 'In Progress'),
