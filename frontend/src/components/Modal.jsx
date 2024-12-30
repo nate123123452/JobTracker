@@ -4,23 +4,27 @@ const Modal = React.forwardRef(({ isOpen, onClose, children }, ref) => {
   const modalRef = useRef();
 
   useEffect(() => {
+    // Function to close modal when clicked outside
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
         onClose();
       }
     };
 
+    // Add event listener when modal is open
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
     }
 
+    // Remove event listener when modal is closed
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, onClose]);
 
+  // If the modal is not open, return null
   if (!isOpen) return null;
 
   return (

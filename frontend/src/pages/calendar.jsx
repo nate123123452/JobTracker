@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import { motion } from 'framer-motion';
-import 'react-big-calendar/lib/css/react-big-calendar.css'; // Ensure this is imported
-import api from '../services/api'; // Import the api instance
-import { toast } from 'react-toastify'; // Import the toast module
+import 'react-big-calendar/lib/css/react-big-calendar.css'; 
+import api from '../services/api'; 
+import { toast } from 'react-toastify'; 
 
 // Localizer for Big Calendar
 const localizer = momentLocalizer(moment);
 
 const CalendarView = () => {
+  // State to manage events and selected event
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  // Function to handle event selection
   const handleSelectEvent = (event) => {
     console.log('Selected event:', event);
     setSelectedEvent({
@@ -26,11 +28,13 @@ const CalendarView = () => {
       endTime: event.end.toISOString().split('T')[1].slice(0, 5),
       location: event.location || 'TBD',
     });
+    // Scroll to the bottom of the page
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 0);
   };
   
+  // Function to delete an interview date
   const handleDeleteInterview = async (job_id, interview_id) => {
     if (!job_id || !interview_id) {
       console.error('Job ID or Interview ID is undefined');
@@ -69,6 +73,7 @@ const CalendarView = () => {
     window.scrollTo(0, 0);
   }, []);
   
+  // Fetch interview dates when component mounts
   useEffect(() => {
     const fetchInterviews = async () => {
       try {
@@ -134,6 +139,7 @@ const CalendarView = () => {
             <p className="text-lg font-semibold text-indigo-600">Location:</p>
             <p className="text-gray-700">{selectedEvent.location}</p>
           </div>
+          {/* Delete Interview Button */}
           <button
             className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600"
             onClick={() => {
@@ -214,13 +220,13 @@ const CalendarView = () => {
           overflow: hidden; /* Hide overflowing text */
         }
 
-        /* Optional: Hover effect for events */
+        /* Hover effect for events */
         .rbc-event:hover {
           background-color: #CBD5E0; /* Slightly darker gray on hover */
           cursor: pointer;
         }
 
-        /* Optional: Change the size of the event box in all views */
+        /* Change the size of the event box in all views */
         .rbc-month-view .rbc-event, 
         .rbc-week-view .rbc-event, 
         .rbc-day-view .rbc-event {

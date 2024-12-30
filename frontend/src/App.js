@@ -11,13 +11,19 @@ import Modal from './components/Modal';
 import LoginForm from './components/LoginForm';
 
 function App() {
+  // State variable to manage modal
   const [isModelOpen, setIsModelOpen] = React.useState(false);
+
+  // State variable to manage login status
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  // State to manage stored username
   const [username, setUsername] = React.useState('');
 
-
+  // Function to toggle modal
   const toggleModal = () => setIsModelOpen(!isModelOpen);
 
+  // Function to handle login success
   const handleLoginSuccess = (username) => {
     setIsLoggedIn(true);
     setUsername(username);
@@ -26,6 +32,7 @@ function App() {
     toggleModal();
   }
 
+  // Function to handle logout
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUsername('');
@@ -39,12 +46,15 @@ function App() {
     });
   }
   
+  // Scroll to top when component mounts
   window.onbeforeunload = function () {
     window.scrollTo(0, 0);
   }
 
   return (
     <Router>
+
+      {/* Navbar component */}
       <Navbar 
         isLoggedIn={isLoggedIn} 
         username={username} 
@@ -53,16 +63,23 @@ function App() {
         setIsLoggedIn={setIsLoggedIn}
         setUsername={setUsername}
       />
+
+      {/* Routes */}
       <Routes>
         <Route path="/" element={<HomePage onGetStartedClick={toggleModal} isLoggedIn={isLoggedIn}/>} />
         <Route path="/jobs" element={<JobPage />} />
         <Route path="/resumes" element={<ResumePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
+
+      {/* Modal for login form */}
       <Modal isOpen={isModelOpen} onClose={toggleModal}>
         <LoginForm onLoginSuccess={handleLoginSuccess} />
       </Modal>
+
+      {/* Toast container */}
       <ToastContainer position="top-center" autoClose={1500} />
+      
     </Router>
   );
 }

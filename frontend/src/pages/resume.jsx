@@ -10,44 +10,36 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Resume = () => {
+  // State variables  for uploaded resumes and visible resumes
   const [uploadedResumes, setUploadedResumes] = useState([]);
   const [visibleResumes, setVisibleResumes] = useState(9);
+
+  // State variable for form data
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     document: null,
     fileName: '',
   });
+
+  // Reference to file input element
   const fileInputRef = useRef(null);
 
+  // Zoom plugin instance
   const zoomPluginInstance = zoomPlugin();
 
-  // Scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const fetchResumes = async () => {
-      try {
-        const response = await api.get('/api/resumes/');
-        setUploadedResumes(response.data);
-      } catch (error) {
-        console.error('Error fetching resumes:', error);
-      }
-    };
-    fetchResumes();
-  }, []);
-
+  // Function to load more resumes
   const loadMoreResumes = () => {
     setVisibleResumes((prevVisible) => prevVisible + 9);
   };
 
+  // Function to handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // Function to handle file change
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
@@ -57,6 +49,7 @@ const Resume = () => {
     }
   };
 
+  // Function to handle drop event
   const handleDrop = (e) => {
     e.preventDefault();  // Prevent default behavior (open as link for some elements)
     const file = e.dataTransfer.files[0];
@@ -66,10 +59,12 @@ const Resume = () => {
       toast.error('Please upload a PDF file.');}
   };
 
+  // Function to handle drag over event
   const handleDragOver = (e) => {
     e.preventDefault(); // Necessary to allow a drop
   };
 
+  // Function to upload file on div click
   const handleDivClick = (e) => {
     e.preventDefault(); // Prevent default behavior (open as link for some elements)
     e.stopPropagation(); // Stop event propagation
@@ -78,6 +73,7 @@ const Resume = () => {
     }
   };
 
+  // Function to handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -118,6 +114,7 @@ const Resume = () => {
     }
   };
 
+  // Function to handle delete
   const handleDelete = async (id) => {
     try {
       await api.delete(`/api/resumes/${id}/`);
@@ -128,6 +125,24 @@ const Resume = () => {
       alert('Failed to delete resume. Please try again.');
     }
   }
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Fetch resumes when component mounts
+  useEffect(() => {
+    const fetchResumes = async () => {
+      try {
+        const response = await api.get('/api/resumes/');
+        setUploadedResumes(response.data);
+      } catch (error) {
+        console.error('Error fetching resumes:', error);
+      }
+    };
+    fetchResumes();
+  }, []);
 
   return (
     <motion.div
@@ -190,7 +205,7 @@ const Resume = () => {
         </div>
       </form>
       
-      {/*Resume Display*/}
+      {/* Resume Display */}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-semibold mb-6 text-center text-indigo-700">Uploaded Resumes</h2>
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

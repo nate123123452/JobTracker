@@ -6,7 +6,22 @@ import { toast } from 'react-toastify';
 import moment from 'moment';
 
 const JobDashboard = () => {
+  // State to manage list of jobs
   const [jobs, setJobs] = useState([]);
+
+  // State to manage search term and filter status
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+
+  // State to manage editing jobs
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingJobId, setEditingJobId] = useState(null);
+
+  // State to manage visible interviews and jobs
+  const [visibleInterviews, setVisibleInterviews] = useState({});
+  const [visibleJobs, setVisibleJobs] = useState(10);
+
+  // State to manage adding/editing jobs
   const [formData, setFormData] = useState({
     company: '',
     title: '',
@@ -17,12 +32,6 @@ const JobDashboard = () => {
     notes: '',
     interview_dates: [],
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingJobId, setEditingJobId] = useState(null);
-  const [visibleInterviews, setVisibleInterviews] = useState({});
-  const [visibleJobs, setVisibleJobs] = useState(10);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -42,6 +51,7 @@ const JobDashboard = () => {
     fetchJobs();
   }, []);
 
+  // Function that updates the form data when input fields change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -49,7 +59,8 @@ const JobDashboard = () => {
       [name]: value,
     });
   };
-
+ 
+  // Function to handle form submission
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,11 +73,13 @@ const JobDashboard = () => {
       }
     }
 
+    // Remove applied_date if it's empty
     const data = { ...formData };
     if (!data.applied_date) {
       delete data.applied_date;
     }
 
+    // If editing, update the job, otherwise add a new job
     if (isEditing) {
       try {
         const response = await api.put(`/api/jobs/${editingJobId}/`, data);
@@ -82,7 +95,8 @@ const JobDashboard = () => {
       } catch (error) {
         console.error('Error updating job:', error);
       }
-    } else {
+    } 
+    else {
       try {
         const response = await api.post('/api/jobs/', data);
         setJobs([...jobs, response.data]);
@@ -104,6 +118,7 @@ const JobDashboard = () => {
     });
   };
 
+  // Function to delete a job
   const handleDeleteJob = async (id) => {
     try {
       await api.delete(`/api/jobs/${id}/`);
@@ -114,6 +129,7 @@ const JobDashboard = () => {
     }
   };
 
+  // Function to edit a job
   const handleEditJob = (id) => {
     const jobToEdit = jobs.find((job) => job.id === id);
     window.scrollTo(0, 0);
@@ -126,6 +142,7 @@ const JobDashboard = () => {
     setEditingJobId(id);
   };
 
+  // Function to handle interview date changes
   const handleInterviewDateChange = (index, field, value) => {
     const updatedInterviewDates = formData.interview_dates.map((interview, i) => {
       if (i === index) {
@@ -136,6 +153,7 @@ const JobDashboard = () => {
     setFormData({ ...formData, interview_dates: updatedInterviewDates });
   };
 
+  // Function to add an interview date
   const addInterviewDate = () => {
     setFormData({
       ...formData,
@@ -147,12 +165,14 @@ const JobDashboard = () => {
     toast.info('Interview date added successfully!');
   };
 
+  // Function to remove an interview date
   const removeInterviewDate = (index) => {
     const updatedInterviewDates = formData.interview_dates.filter((_, i) => i !== index);
     setFormData({ ...formData, interview_dates: updatedInterviewDates });
     toast.info('Interview date removed successfully!');
   };
 
+  // Function to toggle interviews visibility
   const toggleInterviewsVisibility = (jobId) => {
     setVisibleInterviews((prevState) => ({
       ...prevState,
@@ -160,6 +180,7 @@ const JobDashboard = () => {
     }));
   };
 
+  // Filter jobs based on search term and status
   const filteredJobs = Array.isArray(jobs)
     ? jobs.filter((job) => {
         return (
@@ -170,6 +191,7 @@ const JobDashboard = () => {
       })
     : [];
 
+  // Function to load more jobs
   const loadMoreJobs = () => {
     setVisibleJobs((prevVisibleJobs) => prevVisibleJobs + 10);
   }
@@ -354,6 +376,7 @@ const JobDashboard = () => {
                         >
                           {visibleInterviews[job.id] ? 'Hide Interviews' : 'Show Interviews'}
                         </button>
+                        {/* Display interviews if visible */}
                         {visibleInterviews[job.id] && (
                           <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
                             {job.interview_dates.map((interview, index) => {

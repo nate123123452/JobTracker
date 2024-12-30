@@ -12,12 +12,14 @@ const LoginForm = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Function to toggle between login and register form
   const toggleForm = () => {
     setIsLogin(!isLogin);
     resetFormFields();
     setError('');
   };
 
+  // Function to reset form fields
   const resetFormFields = () => { 
     setUsername('');
     setPassword('');
@@ -26,11 +28,13 @@ const LoginForm = ({ onLoginSuccess }) => {
     setError('');
   };
 
+  // Function to validate email
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
+  // Function to handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     const response = await fetch('http://localhost:8000/api/token/', {
@@ -59,6 +63,7 @@ const LoginForm = ({ onLoginSuccess }) => {
     }
   };
 
+  // Function to handle register
   const handleRegister = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -103,6 +108,7 @@ const LoginForm = ({ onLoginSuccess }) => {
     <div className={`text-black ${isLogin ? 'w-60' : 'w-70'} mx-auto`}>
       {isLogin ? (
         <div>
+          {/* Login Form */}
           <h2 className='text-2xl font-bold mb-6'>Login</h2>
           <form onSubmit={handleLogin} className='space-y-6'>
             <div>
@@ -139,6 +145,7 @@ const LoginForm = ({ onLoginSuccess }) => {
         </div>
       ) : (
         <div>
+          {/* Register Form */}
           <h2 className='text-2xl font-bold mb-6'>Register</h2>
           <form onSubmit={handleRegister} className='space-y-6'>
             <div>
