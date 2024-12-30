@@ -7,6 +7,7 @@ import { motion, useInView } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
 const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
+  // Hook to navigate to different pages
   const navigate = useNavigate();
 
   // Function to handle Get Started button click
