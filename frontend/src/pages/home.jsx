@@ -9,13 +9,13 @@ import { Link, useNavigate } from 'react-router-dom';
 const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
   const navigate = useNavigate();
 
+  // Function to handle Get Started button click
   const handleGetStartedClick = () => {
     navigate('/');
     onGetStartedClick();
   };
 
-
-  // Refs and visibility states for each section
+  // References and visibility states for each section used in animations
   const jobRef = React.useRef(null);
   const isJobInView = useInView(jobRef, { once: true });
 
@@ -123,8 +123,7 @@ const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
               </button>
             </Link>
           </div>
-          
-          </motion.div>
+        </motion.div>
       </div>
 
       {/* Calendar Section */}
@@ -158,6 +157,7 @@ const HomePage = ({ isLoggedIn, onGetStartedClick }) => {
           </div>
         </motion.div>
       </div>
+
     </motion.div>
   );
 };

@@ -4,25 +4,33 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Modal from './Modal';
 import LoginForm from './LoginForm';
 
-
 const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUsername, handleLogout, toggleModal, isModelOpen }) => {
+    // State to manage navigation menu visability
     const [nav, setNav] = useState(false);
+    // State to manage logout dropdown visability
     const [showLogout, setShowLogout] = useState(false);
+    // Ref to dropdown menu
     const dropdownRef = useRef(null);
     const navRef = useRef(null);
     const modalRef = useRef(null);
+    // Hooks for navigation and location
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Function to scroll to top
     const scrollToTop = () => window.scrollTo(0, 0);
 
+    // Function to toggle the navigation menu
     const handleNav = () => setNav(!nav);
 
+    // Function to handle login success
     const handleLoginSuccessLocal = () => {
         handleLoginSuccess(username);
         handleNav();
         scrollToTop();
     };
 
+    // Function to handle logout from mobile view
     const handleLogoutMobile = () => {   
         handleLogout();
         handleNav();
@@ -30,22 +38,26 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
         scrollToTop();
     };
 
+    // Function to handle logout from desktop view
     const handleLogoutDesktop = () => {
         handleLogout();
         navigate('/');
         scrollToTop();
     };
 
+    // Function to handle logo click
     const handleLogoClick = () => {
         if (location.pathname === '/') {
             window.location.reload();
         }
     };
 
+    // Function to get the class for active link
     const getLinkClass = (path) => {
         return location.pathname === path ? 'text-[#586eff]' : 'hover:text-[#586eff]';
     };
 
+    // Hook to check if user is logged in
     useEffect(() => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const storedUsername = localStorage.getItem('username');
@@ -55,6 +67,7 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
         }
     }, [setIsLoggedIn, setUsername]);
 
+    // Hook to close navigation menu when resized to desktop
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 768) setNav(false);
@@ -63,6 +76,7 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Hook to close dropdown and navigation menu when clicked outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -102,24 +116,29 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
                             <Link to="/calendar" className='font-montserrat'>Calendar</Link>
                         </li>
                         <li className='p-4 relative'>
+                            {/* User Info */}
                             {isLoggedIn ? (
                                 <>
+                                    {/* User Icon */}
                                     <div
                                         className="cursor-pointer hover:text-[#586eff] transition-colors"
                                         onClick={() => setShowLogout(!showLogout)}
                                     >
                                         <AiOutlineUser size={30} />
                                     </div>
+                                    {/* Logout Dropdown */}
                                     {showLogout && (
                                         <div
                                             ref={dropdownRef}
                                             className="absolute right-4 mt-2 w-48 bg-white text-black rounded-lg shadow-lg transition-all ease-in-out duration-300 z-50"
                                         >
+                                            {/* Logged in as */}
                                             <div className="px-4 py-2 text-sm">
                                                 <span className="block text-[#586eff]">Logged in as:</span>
                                                 <span className="font-bold max-w-[100px] overflow-hidden text-overflow-ellipsis whitespace-nowrap">{username}</span>
                                             </div>
                                             <hr className="border-gray-700" />
+                                            {/* Logout Button */}
                                             <button
                                                 onClick={handleLogoutDesktop}
                                                 className="block px-4 py-2 text-sm hover:bg-red-600 transition-colors w-full text-left rounded-b text-red-500"
@@ -130,6 +149,7 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
                                     )}
                                 </>
                             ) : (
+                                // Login Button if not logged in
                                 <button
                                     onClick={toggleModal}
                                     className='font-montserrat bg-[#586eff] text-white px-4 py-2 rounded'
@@ -140,7 +160,7 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
                         </li>
                     </ul>
 
-                    {/* Hamburger Menu */}
+                    {/* Hamburger Menu For Mobile */}
                     <div onClick={handleNav} className='block md:hidden cursor-pointer mr-6'>
                         {nav ? <AiOutlineClose size={20} /> : <AiOutlineMenu size={20} />}
                     </div>
@@ -199,7 +219,9 @@ const Navbar = ({ handleLoginSuccess, isLoggedIn, setIsLoggedIn, username, setUs
                 </ul>
             </div>
 
+            {/* Login Modal */}
             <Modal isOpen={isModelOpen} onClose={toggleModal} ref={modalRef}>
+                {/* Render LoginForm inside the Modal */}
                 <LoginForm onLoginSuccess={handleLoginSuccessLocal} />
             </Modal>
         </div>
