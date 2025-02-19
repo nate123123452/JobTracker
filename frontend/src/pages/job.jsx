@@ -91,7 +91,6 @@ const JobDashboard = () => {
         );
         setIsEditing(false);
         setEditingJobId(null);
-        toast.success('Job updated successfully!');
       } catch (error) {
         console.error('Error updating job:', error);
       }

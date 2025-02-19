@@ -1,5 +1,6 @@
 # Virtual Environment
 venv/
+.env
 
 # Python
 __pycache__/
@@ -33,3 +34,7 @@ backend/media/
 # System Files
 .DS_Store
 Thumbs.db
+
+# Environment Files
+*.env
+.env.*
