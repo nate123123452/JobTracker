@@ -32,7 +32,7 @@ class Job(models.Model):
     company = models.CharField(blank=True, null=True, max_length=255, default='N/A')
     title = models.CharField(blank=True, null=True, max_length=255, default='N/A')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Progress')
-    site = models.URLField(blank=True, null=True)
+    site = models.URLField(max_length=500, blank=True, null=True)
     applied_date = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=50, choices=LOCATION_CHOICES, default='In Person')
     notes = models.TextField(blank=True, null=True)

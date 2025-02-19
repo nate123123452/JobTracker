@@ -96,14 +96,18 @@ const JobDashboard = () => {
         console.error('Error updating job:', error);
       }
     } 
-    else {
-      try {
-        const response = await api.post('/api/jobs/', data);
-        setJobs([...jobs, response.data]);
-        toast.success('Job added successfully!');
-      } catch (error) {
-        toast.error('Login To Add a Job');
-      }
+    try {
+      const response = await api.post('/api/jobs/', data);
+      console.log('Response:', response.data); // Log the response
+      setJobs([...jobs, response.data]);
+      toast.success('Job added successfully!');
+    } catch (error) {
+      console.error('Error adding job:', {
+        message: error.message,
+        response: error.response, // Log the full response
+        request: error.request,
+        config: error.config,
+      });      toast.error('Login To Add a Job');
     }
 
     setFormData({
