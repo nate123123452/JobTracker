@@ -4,10 +4,11 @@
 The Job Tracker Application is a full-stack web application designed to help users manage their job applications, resumes, and interview schedules efficiently. It provides a user-friendly interface for tracking job applications, uploading resumes, and scheduling interviews.
 
 ## Features
+- **User Authentication**: Secure user authentication using JWT.
+![Login Page](./images/first.png)
 - **Job Management**: Add, edit, and delete job applications.
 - **Resume Upload**: Upload and manage resumes.
 - **Interview Scheduling**: Schedule, view, and delete interview dates.
-- **User Authentication**: Secure user authentication using JWT.
 - **Responsive Design**: Mobile-friendly interface.
 
 ## Technologies Used
@@ -89,6 +90,3 @@ The Job Tracker Application is a full-stack web application designed to help use
   - POST /api/register/: Register a new user
   - POST /api/token/: Obtain a JWT token
   - POST /api/token/refresh/: Refresh a JWT token
-
-### Contact
-For any inquiries, please contact nathan.tran1717@gmail.com
