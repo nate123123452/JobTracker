@@ -5,16 +5,16 @@ The Job Tracker Application is a full-stack web application designed to help use
 
 ## Features
 - **User Authentication**: Secure user authentication using JWT.
-![First Step](./gitimages/first.png) | ![Second Step](./gitimages/second.png)
+![First Step](./gitimages/first.png) ![Second Step](./gitimages/second.png)
 
 - **Job Management**: Add, edit, and delete job applications.
-![Third Step](./gitimages/third.png) | ![Fourth Step](./gitimages/fourth.png)
+![Third Step](./gitimages/third.png) ![Fourth Step](./gitimages/fourth.png)
 
 - **Resume Upload**: Upload and manage resumes.
-![Fifth Step](./gitimages/fifth.png) | ![Sixth Step](./gitimages/sixth.png)
+![Fifth Step](./gitimages/fifth.png) ![Sixth Step](./gitimages/sixth.png)
 
 - **Interview Scheduling**: Schedule, view, and delete interview dates.
-![Seventh Step](./gitimages/seventh.png) | ![Eighth Step](./gitimages/eighth.png)
+![Seventh Step](./gitimages/seventh.png) ![Eighth Step](./gitimages/eighth.png)
 
 - **Responsive Design**: Mobile-friendly interface.
 
